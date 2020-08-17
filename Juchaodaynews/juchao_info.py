@@ -15,6 +15,7 @@ from base_spider import SpiderBase
 class JuChaoInfo(SpiderBase):
     def __init__(self):
         super(JuChaoInfo, self).__init__()
+        self.web_url = 'http://webapi.cninfo.com.cn/#/aiInfos'
         self.zuixin_url = "http://webapi.cninfo.com.cn//api/sysapi/p_sysapi1128"
         self.stock_url = "http://webapi.cninfo.com.cn//api/sysapi/p_sysapi1078"
         self.fund_url = "http://webapi.cninfo.com.cn//api/sysapi/p_sysapi1126"

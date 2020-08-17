@@ -1,6 +1,13 @@
 ## 项目 
 ###  巨潮快讯
 https://tower.im/teams/12559/todos/39411/ 
+### 巨潮 AI 资讯
+https://tower.im/teams/12559/todos/36605/
+### 经济观察网 
+https://tower.im/teams/12559/todos/39420/
+
+
+
 
 
 ## 定时框架
