@@ -48,7 +48,7 @@ class JuchaoDayNews(SpiderBase):
           `CREATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP,
           `UPDATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`id`),
-          UNIQUE KEY `date_link` (`pub_date`, `link`),
+          UNIQUE KEY `date_title` (`pub_date`, `title`),
           KEY `pub_date` (`pub_date`),
           KEY `update_time` (`UPDATETIMEJZ`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='{}'; 

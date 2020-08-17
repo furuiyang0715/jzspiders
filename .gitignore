@@ -1,3 +1,5 @@
 .idea/
 .conf
 __pycache__/
+*.log
+*.pid
