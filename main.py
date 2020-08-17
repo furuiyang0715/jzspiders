@@ -46,11 +46,12 @@ class DockerSwith(SpiderBase, Daemon):
     def ding_crawl_information(self):
         self._spider_init()
         msg = ''
-        for table, info in spiders_config.items:
+        for table, info in spiders_config.items():
             dt_benchmark = info[-2]
+            chiname = info[-1]
             sql = '''SELECT count(id) as inc_count FROM {} WHERE {} > date_sub(CURDATE(), interval 1 day);'''.format(table, dt_benchmark)
             inc_count = self.spider_client.select_one(sql).get("inc_count")
-            msg += '{} 今日新增 {}\n'.format(table, inc_count)
+            msg += '{} 今日新增 {}\n'.format(chiname, inc_count)
         if not LOCAL:
             self.ding(msg)
         else:
@@ -139,8 +140,8 @@ class DockerSwith(SpiderBase, Daemon):
 
 
 if __name__ == "__main__":
-    utils.clear_all_containers()
-    utils.build_docker_image()
+    # utils.clear_all_containers()
+    # utils.build_docker_image()
 
     pid_file = os.path.join(cur_path, 'main.pid')
     log_file = os.path.join(cur_path, 'main.log')
