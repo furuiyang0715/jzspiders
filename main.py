@@ -7,7 +7,6 @@ import traceback
 
 import docker
 import schedule
-import utils
 
 cur_path = os.path.split(os.path.realpath(__file__))[0]
 file_path = os.path.abspath(os.path.join(cur_path, ".."))

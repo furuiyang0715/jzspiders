@@ -14,4 +14,6 @@ spiders_config = {
 
     'NewsYicai': ['YiCai/yicai_spider.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '第一财经'],
 
+    'Takungpao': ['Takungpao/takungpao_main.py', 'interval', (15, 'minutes'), "CREATETIMEJZ", '大公报'],
+
 }
