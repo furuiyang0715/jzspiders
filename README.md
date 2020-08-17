@@ -7,6 +7,8 @@ https://tower.im/teams/12559/todos/36605/
 https://tower.im/teams/12559/todos/39420/
 ### 牛仔网评论 
 https://tower.im/teams/12559/todos/39421/ 
+### 央视网财经频道
+https://tower.im/teams/12559/todos/39132/
 
 
 

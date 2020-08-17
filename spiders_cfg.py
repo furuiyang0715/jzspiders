@@ -8,5 +8,6 @@ spiders_config = {
 
     "9666pinglun": ['CN966/9666pinglun.py', 'interval', (10, "minutes"), "CREATETIMEJZ", '牛仔网评论'],
 
+    'cctvfinance': ['CCTVFinance/cctv_spider.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '央视网财经'],
 
 }
