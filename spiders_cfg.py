@@ -10,4 +10,6 @@ spiders_config = {
 
     'cctvfinance': ['CCTVFinance/cctv_spider.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '央视网财经'],
 
+    'p2peye_news': ['P2Peye/p2peyespider.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '网贷天眼查'],
+
 }
