@@ -6,5 +6,7 @@ spiders_config = {
 
     "EEONews": ['EEOFinance/eeospider.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '经济观察网'],
 
+    "9666pinglun": ['CN966/9666pinglun.py', 'interval', (10, "minutes"), "CREATETIMEJZ", '牛仔网评论'],
+
 
 }

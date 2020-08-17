@@ -5,6 +5,9 @@ https://tower.im/teams/12559/todos/39411/
 https://tower.im/teams/12559/todos/36605/
 ### 经济观察网 
 https://tower.im/teams/12559/todos/39420/
+### 牛仔网评论 
+https://tower.im/teams/12559/todos/39421/ 
+
 
 
 
