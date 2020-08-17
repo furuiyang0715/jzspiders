@@ -140,9 +140,6 @@ class DockerSwith(SpiderBase, Daemon):
 
 
 if __name__ == "__main__":
-    # utils.clear_all_containers()
-    # utils.build_docker_image()
-
     pid_file = os.path.join(cur_path, 'main.pid')
     log_file = os.path.join(cur_path, 'main.log')
     worker = DockerSwith(

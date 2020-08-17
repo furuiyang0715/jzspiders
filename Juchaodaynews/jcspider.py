@@ -58,11 +58,10 @@ class JuchaoDayNews(SpiderBase):
 
     def start(self):
         self._create_table()
-        start_day = datetime.datetime(2020, 6, 1)
-        # start_day = datetime.datetime(2020, 8, 13)
         end_day = datetime.datetime.combine(datetime.datetime.now(), datetime.time.min)
-        # print(start_day)
-        # print(end_day)
+        # start_day = datetime.datetime(2020, 6, 1)    # 历史的
+        start_day = end_day    # 定时增量
+
         _day = start_day
         while _day <= end_day:
             _day_str = _day.strftime("%Y-%m-%d")
