@@ -12,4 +12,6 @@ spiders_config = {
 
     'p2peye_news': ['P2Peye/p2peyespider.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '网贷天眼查'],
 
+    'NewsYicai': ['YiCai/yicai_spider.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '第一财经'],
+
 }
