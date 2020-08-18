@@ -32,4 +32,6 @@ spiders_config = {
 
     'chinabank': ['GovSpiders/gov_main.py', 'interval', (2, 'days'), "CREATETIMEJZ", '中国银行'],
 
+    'qq_Astock_news': ['QQStock/qq_stock.py', 'interval', (9, 'minutes'), "CREATETIMEJZ", '腾讯财经[A股]'],
+
 }
