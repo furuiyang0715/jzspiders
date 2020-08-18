@@ -34,4 +34,6 @@ spiders_config = {
 
     'qq_Astock_news': ['QQStock/qq_stock.py', 'interval', (9, 'minutes'), "CREATETIMEJZ", '腾讯财经[A股]'],
 
+    'eastmoney_carticle': ['CArticle/ca_main.py', 'interval', (6, 'hours'), "CREATETIMEJZ", '东财财富号'],
+
 }

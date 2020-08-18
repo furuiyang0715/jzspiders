@@ -31,6 +31,9 @@ https://tower.im/teams/12559/todos/29256/
 https://tower.im/teams/12559/todos/29254/
 ### 腾讯财经 A 股
 https://tower.im/teams/12559/todos/36525/ 
+### 东财财富号
+https://tower.im/teams/12559/todos/35213/
+
 
 
 
