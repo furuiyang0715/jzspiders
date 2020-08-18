@@ -26,4 +26,6 @@ spiders_config = {
 
     'netease_money': ['Money163/netease_money.py', 'interval', (9, 'minutes'), "CREATETIMEJZ", '网易财经'],
 
+    'cls_telegraphs': ['ClsCnInfo/telegraphs.py', 'interval', (9, 'minutes'), "CREATETIMEJZ", '财新社-电报'],
+
 }

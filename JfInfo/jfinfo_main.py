@@ -19,6 +19,7 @@ class JFSchedule(object):
 
     table_name = 'jfinfo'
     # dt_benchmark = 'pub_date'
+    name = '巨丰财经'
 
     def ins_start(self, instance):
         instance.start()

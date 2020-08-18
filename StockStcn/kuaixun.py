@@ -396,7 +396,8 @@ class STCNSchedule(object):
     ]
 
     table_name = "stcn_info"
-    dt_benchmark = 'pub_date'
+    # dt_benchmark = 'pub_date'
+    name = '上海证券报'
 
     def ins_start(self, instance):
         instance.start()

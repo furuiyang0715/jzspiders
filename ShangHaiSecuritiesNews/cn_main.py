@@ -18,6 +18,7 @@ class CNSchedule(object):
 
     table_name = 'cn_stock'
     # dt_benchmark = 'pub_date'
+    name = '上海证券报'
 
     def ins_start(self, instance):
         instance.start()

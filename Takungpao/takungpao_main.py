@@ -35,6 +35,7 @@ class TakungpaoSchedule(object):
     ]
 
     table_name = 'Takungpao'
+    name = '大公报'
 
     def ins_start(self, instance):
         instance.start()
