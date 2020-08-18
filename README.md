@@ -20,6 +20,11 @@ https://tower.im/teams/12559/todos/36693/
 ### 证券时报网
 https://tower.im/teams/12559/todos/36604/
 ### 上海证券报 
+https://tower.im/teams/12559/todos/36603/ 
+### 网易财经
+https://tower.im/teams/12559/todos/36511/ 
+
+
 
 
 

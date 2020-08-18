@@ -24,4 +24,6 @@ spiders_config = {
 
     'cn_stock': ['ShangHaiSecuritiesNews/cn_main.py', 'interval', (9, 'minutes'), "CREATETIMEJZ", '上海证券报'],
 
+    'netease_money': ['Money163/netease_money.py', 'interval', (9, 'minutes'), "CREATETIMEJZ", '网易财经'],
+
 }
