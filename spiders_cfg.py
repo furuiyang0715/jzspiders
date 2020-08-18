@@ -18,4 +18,6 @@ spiders_config = {
 
     'SohuFinance': ['sohu/sohu_spider.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '搜狐财经'],
 
+    'jfinfo': ['JfInfo/jfinfo_main.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '巨丰财经'],
+
 }
