@@ -20,4 +20,6 @@ spiders_config = {
 
     'jfinfo': ['JfInfo/jfinfo_main.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '巨丰财经'],
 
+    'stcn_info': ['StockStcn/kuaixun.py', 'interval', (11, 'minutes'), "CREATETIMEJZ", '证券时报网'],
+
 }

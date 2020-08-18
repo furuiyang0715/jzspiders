@@ -17,6 +17,8 @@ https://tower.im/teams/12559/todos/39012/
 https://tower.im/teams/12559/todos/36516/
 ### 巨丰财经
 https://tower.im/teams/12559/todos/36693/
+### 证券时报网
+https://tower.im/teams/12559/todos/36604/
 
 
 
