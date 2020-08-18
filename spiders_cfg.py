@@ -28,4 +28,8 @@ spiders_config = {
 
     'cls_telegraphs': ['ClsCnInfo/telegraphs.py', 'interval', (9, 'minutes'), "CREATETIMEJZ", '财新社-电报'],
 
+    'gov_stats': ['GovSpiders/gov_main.py', 'interval', (2, 'days'), "CREATETIMEJZ", '国家统计局'],
+
+    'chinabank': ['GovSpiders/gov_main.py', 'interval', (2, 'days'), "CREATETIMEJZ", '中国银行'],
+
 }
