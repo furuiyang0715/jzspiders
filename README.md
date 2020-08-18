@@ -13,6 +13,8 @@ https://tower.im/teams/12559/todos/39132/
 https://tower.im/teams/12559/todos/39056/
 ### 第一财经 
 https://tower.im/teams/12559/todos/39012/
+### 搜狐财经 
+https://tower.im/teams/12559/todos/36516/
 
 
 
