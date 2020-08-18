@@ -22,4 +22,6 @@ spiders_config = {
 
     'stcn_info': ['StockStcn/kuaixun.py', 'interval', (11, 'minutes'), "CREATETIMEJZ", '证券时报网'],
 
+    'cn_stock': ['ShangHaiSecuritiesNews/cn_main.py', 'interval', (9, 'minutes'), "CREATETIMEJZ", '上海证券报'],
+
 }
