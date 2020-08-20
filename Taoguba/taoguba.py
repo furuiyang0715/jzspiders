@@ -208,5 +208,5 @@ class Taoguba(SpiderBase):
 
 
 if __name__ == "__main__":
-    # Taoguba("格力电器", "sz000651").start()
-    Taoguba("视源股份", "sz002841").start()
+    Taoguba("格力电器", "sz000651").start()
+    # Taoguba("视源股份", "sz002841").start()
