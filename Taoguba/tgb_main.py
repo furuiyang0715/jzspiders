@@ -7,7 +7,7 @@ file_path = os.path.abspath(os.path.join(cur_path, ".."))
 sys.path.insert(0, file_path)
 
 from Taoguba.taoguba import Taoguba
-from base import SpiderBase
+from base_spider import SpiderBase
 
 
 class TgbSchedule(SpiderBase):
