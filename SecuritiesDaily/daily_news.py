@@ -55,7 +55,8 @@ class SecuritiesDaily(SpiderBase):
 
     def start(self):
         self._create_table()
-        for i in range(1, 16):
+        # for i in range(1, 16):
+        for i in range(1, 2):
             list_url = self.list_url_base.format(i)
             resp = requests.get(list_url)
             if resp and resp.status_code == 200:

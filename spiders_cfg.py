@@ -36,6 +36,6 @@ spiders_config = {
 
     'eastmoney_carticle': ['CArticle/ca_main.py', 'interval', (6, 'hours'), "CREATETIMEJZ", '东财财富号'],
 
-    'securities_daily_latest': ['SecuritiesDaily/daily_news.py', 'interval', (2, 'hours'), "CREATETIMEJZ", '证券日报-最新播报'],
+    'securities_daily_latest': ['SecuritiesDaily/daily_news.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '证券日报-最新播报'],
 
 }
