@@ -38,4 +38,6 @@ spiders_config = {
 
     'securities_daily_latest': ['SecuritiesDaily/daily_news.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '证券日报-最新播报'],
 
+    'xueqiu_livenews': ['Kuaixun/xueqiu.py', 'interval', (1, 'minutes'), "CREATETIMEJZ", '雪球快讯'],
+
 }
