@@ -64,7 +64,8 @@ class XueQiuKuaiXun(SpiderBase):
                 }
                 print(to_insert)
                 to_insert_lst.append(to_insert)
-                if _pub_date < datetime.datetime.combine(datetime.datetime.today(), datetime.time.min):
+                # if _pub_date < datetime.datetime.combine(datetime.datetime.today(), datetime.time.min):
+                if _pub_date < datetime.datetime.now() - datetime.timedelta(minutes=60):
                     self._batch_save(self.spider_client, to_insert_lst, self.table_name, self.fields)
                     return None
             self._batch_save(self.spider_client, to_insert_lst, self.table_name, self.fields)
