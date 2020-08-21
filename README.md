@@ -36,7 +36,7 @@ https://tower.im/teams/12559/todos/35213/
 ### 证券日报网-最新播报 
 https://tower.im/teams/12559/todos/39449/ 
 ### 雪球快讯
-
+https://tower.im/teams/12559/todos/39462/
 
 
 
