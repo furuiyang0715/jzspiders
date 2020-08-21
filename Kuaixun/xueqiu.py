@@ -32,7 +32,6 @@ class XueQiuKuaiXun(SpiderBase):
           `CREATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP,
           `UPDATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`id`),
-          UNIQUE KEY `link` (`pub_date`, `text`),
           KEY `pub_date` (`pub_date`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='{}';
         '''.format(self.table_name, self.name)
@@ -55,6 +54,7 @@ class XueQiuKuaiXun(SpiderBase):
                         "pub_date": _pub_date,
                         "text": item.get("text"),
                         "link": item.get("link"),
+                        'id': item.get("id"),
                     })
                 if _pub_date < datetime.datetime(2020, 8, 1):
                     self._batch_save(self.spider_client, to_insert_lst, self.table_name, self.fields)
@@ -69,6 +69,7 @@ class XueQiuKuaiXun(SpiderBase):
             print(next_url)
             next_url = self.fetch_datas(next_url)
             time.sleep(0.5)
+        print("over")
 
 
 if __name__ == '__main__':
