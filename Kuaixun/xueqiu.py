@@ -32,7 +32,7 @@ class XueQiuKuaiXun(SpiderBase):
           `CREATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP,
           `UPDATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`id`),
-          UNIQUE KEY `link` (`link`),
+          UNIQUE KEY `link` (`pub_date`, `text`),
           KEY `pub_date` (`pub_date`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='{}';
         '''.format(self.table_name, self.name)
@@ -49,15 +49,16 @@ class XueQiuKuaiXun(SpiderBase):
             items = datas.get("items")
             to_insert_lst = []
             for item in items:
+                _pub_date = datetime.datetime.fromtimestamp(int(item.get("created_at") / 1000))
                 to_insert_lst.append(
                     {
-                        "pub_date": datetime.datetime.fromtimestamp(int(item.get("created_at") / 1000)),
+                        "pub_date": _pub_date,
                         "text": item.get("text"),
                         "link": item.get("link"),
                     })
-            # save items
-            # for one in to_insert_lst:
-            #     print(one)
+                if _pub_date < datetime.datetime(2020, 8, 1):
+                    self._batch_save(self.spider_client, to_insert_lst, self.table_name, self.fields)
+                    return None
             self._batch_save(self.spider_client, to_insert_lst, self.table_name, self.fields)
             return next_url
 
@@ -67,7 +68,7 @@ class XueQiuKuaiXun(SpiderBase):
         while next_url:
             print(next_url)
             next_url = self.fetch_datas(next_url)
-            time.sleep(5)
+            time.sleep(0.5)
 
 
 if __name__ == '__main__':
