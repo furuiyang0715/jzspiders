@@ -33,6 +33,10 @@ https://tower.im/teams/12559/todos/29254/
 https://tower.im/teams/12559/todos/36525/ 
 ### 东财财富号
 https://tower.im/teams/12559/todos/35213/
+### 证券日报网-最新播报 
+https://tower.im/teams/12559/todos/39449/ 
+### 雪球快讯
+
 
 
 
