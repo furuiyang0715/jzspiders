@@ -85,9 +85,10 @@ class NetEaseMoney(SpiderBase):
 
                 if article:
                     item['article'] = article
+                    print(item)
                     items.append(item)
-                    if len(items) > 30:
-                        break
+                    # if len(items) > 30:
+                    #     break
         else:
             raise Exception("请求无响应")
 

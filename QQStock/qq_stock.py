@@ -13,6 +13,7 @@ from base_spider import SpiderBase
 
 class qqStock(SpiderBase):
     def __init__(self):
+        # TODO 重构: https://new.qq.com/ch/finance/
         super(qqStock, self).__init__()
         self.extractor = GeneralNewsExtractor()
         self.token = "8f6b50e1667f130c10f981309e1d8200"
@@ -36,7 +37,7 @@ class qqStock(SpiderBase):
           UNIQUE KEY `link` (`link`),
           KEY `pub_date` (`pub_date`),
           KEY `update_time` (`UPDATETIMEJZ`)
-        ) ENGINE=InnoDB AUTO_INCREMENT=64896 DEFAULT CHARSET=utf8mb4 COMMENT='腾讯财经[A股]'; 
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='腾讯财经[A股]'; 
         '''.format(self.table_name)
         self._spider_init()
         self.spider_client.insert(sql)
