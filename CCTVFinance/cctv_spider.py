@@ -11,6 +11,7 @@ file_path = os.path.abspath(os.path.join(cur_path, ".."))
 sys.path.insert(0, file_path)
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class CCTVFinance(SpiderBase):
@@ -21,7 +22,9 @@ class CCTVFinance(SpiderBase):
         self.extractor = GeneralNewsExtractor()
         self.fields = ['title', 'keywords', 'pub_date', 'brief', 'link', 'article']
         self.table_name = 'cctvfinance'
-        self.name = '央视网-财经频道'
+        # self.name = '央视网-财经频道'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def _create_table(self):
         create_sql = '''
@@ -85,6 +88,26 @@ class CCTVFinance(SpiderBase):
                     items.append(item)
                     ret = self._save(self.spider_client, item, self.table_name, self.fields)
 
+    def trans_history(self):
+        self._spider_init()
+        trans_sql = '''select pub_date as PubDatetime,\
+title as Title,\
+keywords as KeyWords,\
+link as Website,\
+brief as Abstract, \
+article as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit 10; '''.format(self.table_name)
+        datas = self.spider_client.select_all(trans_sql)
+        for data in datas:
+            data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+            data['MedName'] = self.name
+            data['OrgMedName'] = self.name
+            data['OrgTableCode'] = self.table_code
+            print(data)
+
 
 if __name__ == "__main__":
-    CCTVFinance().start()
+    # CCTVFinance().start()
+    CCTVFinance().trans_history()
