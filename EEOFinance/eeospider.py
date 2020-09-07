@@ -8,6 +8,8 @@ import time
 import requests
 from lxml import html
 
+from scripts import utils
+
 cur_path = os.path.split(os.path.realpath(__file__))[0]
 file_path = os.path.abspath(os.path.join(cur_path, ".."))
 sys.path.insert(0, file_path)
@@ -62,7 +64,9 @@ class EEOSpider(SpiderBase):
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36',
         }
         self.table_name = 'EEONews'
-        self.name = '经济观察网新闻'
+        # self.name = '经济观察网新闻'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
         self.fields = ['pub_date', 'title', 'link', 'article', 'author']
 
     def get_topic(self, url):
@@ -207,7 +211,29 @@ class EEOSpider(SpiderBase):
             if api_topic_items and isinstance(api_topic_items, list):
                 ret = self._batch_save(self.spider_client, api_topic_items, self.table_name, self.fields)
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):    # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+title as Title,\
+link as Website,\
+article as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == '__main__':
-    eeo = EEOSpider()
-    eeo.start()
+    # EEOSpider().start()
+
+    EEOSpider().trans_history()
