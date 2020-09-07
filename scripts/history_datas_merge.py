@@ -87,39 +87,9 @@ class MergeHistory(SpiderBase):
 
     def start(self):
         self._create_table()
-
-        for table in self.tables:
-            self.show_create_table(table)
-        print(set(self.fields))
-
-        fields = {
-            'author',
-            'UPDATETIMEJZ',
-            'article',
-            'code',
-            'name',
-            'keywords',
-            'content',
-            'link',         # Website
-            'summary',
-            'title',        # Title
-            'type',
-            'pub_date',     # PubDatetime
-            'CREATETIMEJZ',
-            'id',
-            'source',
-            'text',
-            'category',
-            'brief',
-        }
-
-        fields_map = {
-            'pub_date': 'PubDatetime',
-            'title': 'Title',
-
-
-        }
-
+        # for table in self.tables:
+        #     self.show_create_table(table)
+        # print(set(self.fields))
 
         pass
 
