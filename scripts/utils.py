@@ -44,12 +44,16 @@ org_tablecode_map = {
 }
 
 
-'''
+''' UNIQUE KEY `date_title` (`pub_date`,`title`),
+(1) 巨潮快讯 
 select code as SecuCode, name as SecuAbbr, pub_date as PubDatetime, \
 title as Title, type as InnerType, link as Website, CREATETIMEJZ, UPDATETIMEJZ \
-from juchao_kuaixun limit 10; 
- 
+from juchao_kuaixun limit 10 \G
 
 
+'''
+
+
+'''
 
 '''
