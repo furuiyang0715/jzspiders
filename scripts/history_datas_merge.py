@@ -44,12 +44,11 @@ class MergeHistory(SpiderBase):
           `SecuAbbr` varchar(16) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '证券简称',
           `InnerType` varchar(16) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '内部资讯类别', 
           `KeyWords` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '文章关键词', 
-          `DupField` varchar(20) NOT NULL COMMENT '资讯去重依据', 
+          `DupField` varchar(128) NOT NULL COMMENT '资讯去重依据', 
           `CreateTime` datetime DEFAULT CURRENT_TIMESTAMP,
           `UpdateTime` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`id`),
-          UNIQUE KEY `unified_key1` (`OrgTableCode`) USING BTREE,
-          UNIQUE KEY `unified_key2` (`DupField`) USING BTREE,
+          UNIQUE KEY `unified_key` (`DupField`) USING BTREE,
           KEY `key` (`PubDatetime`, `MedName`, `OrgTableCode`, `OrgMedName`, `UpdateTime`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='原始爬虫数据汇总表';  
         '''
@@ -57,16 +56,8 @@ class MergeHistory(SpiderBase):
         self.spider_client.insert(sql)
         self.spider_client.end()
 
-    # def show_create_table(self, table):
-    #     sql = '''select * from {} limit 1; '''.format(table)
-    #     info = self.spider_client.select_one(sql)
-    #     if info:
-    #         self.fields.extend(list(info.keys()))
-
     def start(self):
         self._create_table()
-
-        pass
 
 
 if __name__ == '__main__':

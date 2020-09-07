@@ -90,7 +90,8 @@ class CCTVFinance(SpiderBase):
 
     def trans_history(self):
         self._spider_init()
-        trans_sql = '''select pub_date as PubDatetime,\
+        for i in range(1000):    # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
 title as Title,\
 keywords as KeyWords,\
 link as Website,\
@@ -98,16 +99,20 @@ brief as Abstract, \
 article as Content, \
 CREATETIMEJZ as CreateTime, \
 UPDATETIMEJZ as UpdateTime \
-from {} limit 10; '''.format(self.table_name)
-        datas = self.spider_client.select_all(trans_sql)
-        for data in datas:
-            data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
-            data['MedName'] = self.name
-            data['OrgMedName'] = self.name
-            data['OrgTableCode'] = self.table_code
-            print(data)
+from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
 
 
 if __name__ == "__main__":
     # CCTVFinance().start()
+
     CCTVFinance().trans_history()
