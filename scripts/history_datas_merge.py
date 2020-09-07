@@ -8,7 +8,22 @@ class MergeHistory(SpiderBase):
         super(MergeHistory, self).__init__()
         self.tables = list(spiders_config.keys())
         self._spider_init()
-        self.fields = []
+        self.fields = [
+            'id',  # 自增 ID
+            'PubDatetime',    # 对应于网站的发布时间 pub_date
+            'MedName',  # 资讯来源，网站名称，类似于 "巨潮快讯"、"财联社" 等 ...
+            'Title',  # 文章标题，对应于分表中的 title
+            'Website',  # 网址，对应于分表中的 link
+            'OrgTableCode',  # 资讯原始来源代码 在 https://shimo.im/sheet/GhgYXDg3xJRWY6G8/s3E4K 中找对应
+            'OrgMedName',  # 资讯原始来源
+            'Abstract',  # 摘要，可为空
+            'Content',   # 资讯文章正文
+            'SecuCode',    # 相关股票代码
+            'SecuAbbr',   # 相关股票简称
+            'InnerType',  # 内部资讯类别
+            'CreateTime',  # 创建时间
+            'UpdateTime',   # 更新时间
+        ]
 
     def _create_table(self):
         """创建汇总表"""
@@ -67,6 +82,9 @@ class MergeHistory(SpiderBase):
           `OrgMedName` varchar(50) NOT NULL COMMENT '资讯来源（原始-一般在详情页标题下方）',
           `Abstract` varchar(1000) DEFAULT NULL COMMENT '摘要(有的网站有摘要这个字段，如有则写，没有就留空)',
           `Content` longtext DEFAULT NULL COMMENT '资讯文章正文',
+          `SecuCode` varchar(8) DEFAULT NULL COMMENT '证券代码',
+          `SecuAbbr` varchar(16) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '证券简称',
+          `InnerType` varchar(16) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '内部资讯类别', 
           `CreateTime` datetime DEFAULT CURRENT_TIMESTAMP,
           `UpdateTime` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`id`),

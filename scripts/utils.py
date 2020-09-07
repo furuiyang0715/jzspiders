@@ -42,3 +42,14 @@ org_tablecode_map = {
     'xueqiu_livenews': ['雪球快讯', 1074, ],
 
 }
+
+
+'''
+select code as SecuCode, name as SecuAbbr, pub_date as PubDatetime, \
+title as Title, type as InnerType, link as Website, CREATETIMEJZ, UPDATETIMEJZ \
+from juchao_kuaixun limit 10; 
+ 
+
+
+
+'''
