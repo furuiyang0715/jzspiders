@@ -10,6 +10,8 @@ file_path = os.path.abspath(os.path.join(cur_path, ".."))
 sys.path.insert(0, file_path)
 
 from base_spider import SpiderBase
+from scripts import utils
+
 requests.packages.urllib3.disable_warnings()
 
 
@@ -17,7 +19,9 @@ class Telegraphs(SpiderBase):
     def __init__(self):
         super(Telegraphs, self).__init__()
         self.table_name = 'cls_telegraphs'
-        self.name = '财新社-电报'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
+        # self.name = '财新社-电报'
         self.web_url = 'https://www.cls.cn/telegraph'
         self.url_format = '''https://www.cls.cn/nodeapi/telegraphList?\
 app=CailianpressWeb\
@@ -100,7 +104,28 @@ app=CailianpressWeb\
         self.spider_client.insert(create_sql)
         self.spider_client.end()
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):  # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+title as Title,\
+article as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Title'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == "__main__":
-    tele = Telegraphs()
-    tele.start()
+    # Telegraphs().start()
+
+    Telegraphs().trans_history()
