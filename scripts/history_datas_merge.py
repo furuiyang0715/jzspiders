@@ -1,10 +1,14 @@
 """完成历史数据的汇总"""
+from base_spider import SpiderBase
 from spiders_cfg import spiders_config
 
 
-class MergeHistory(object):
+class MergeHistory(SpiderBase):
     def __init__(self):
+        super(MergeHistory, self).__init__()
         self.tables = list(spiders_config.keys())
+        self._spider_init()
+        self.fields = []
 
     def _create_table(self):
         """创建汇总表"""
@@ -53,7 +57,7 @@ class MergeHistory(object):
         ]
 
         sql2 = '''
-        CREATE TABLE `OriginSpiderAll` (
+        CREATE TABLE IF NOT EXISTS `OriginSpiderAll` (
           `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
           `PubDatetime` datetime NOT NULL COMMENT '发布时间(精确到秒)',
           `MedName` varchar(50) NOT NULL COMMENT '资讯来源（网站名称）',
@@ -72,8 +76,54 @@ class MergeHistory(object):
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='原始爬虫数据汇总表';  
         '''
 
+        self.spider_client.insert(sql2)
+        self.spider_client.end()
+
+    def show_create_table(self, table):
+        sql = '''select * from {} limit 1; '''.format(table)
+        info = self.spider_client.select_one(sql)
+        if info:
+            self.fields.extend(list(info.keys()))
+
+    def start(self):
+        self._create_table()
+
+        for table in self.tables:
+            self.show_create_table(table)
+        print(set(self.fields))
+
+        fields = {
+            'author',
+            'UPDATETIMEJZ',
+            'article',
+            'code',
+            'name',
+            'keywords',
+            'content',
+            'link',         # Website
+            'summary',
+            'title',        # Title
+            'type',
+            'pub_date',     # PubDatetime
+            'CREATETIMEJZ',
+            'id',
+            'source',
+            'text',
+            'category',
+            'brief',
+        }
+
+        fields_map = {
+            'pub_date': 'PubDatetime',
+            'title': 'Title',
+
+
+        }
+
+
+        pass
+
 
 if __name__ == '__main__':
     merge = MergeHistory()
-    print(merge.tables)
-
+    merge.start()
