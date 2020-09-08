@@ -11,9 +11,11 @@ from Takungpao.hkstock_cjss import HKStock_CJSS, HKStock_GJJJ, HKStock_GSYW, HKS
 from Takungpao.takungpao_fk import FK
 from Takungpao.takungpao_travel import Travel
 from Takungpao.zhongguojingji import Business, DiChan, GuoJiJingJi, HKStock, HKCaiJing, NewFinanceTrend, ZhongGuoJingJi
+from base_spider import SpiderBase
+from scripts import utils
 
 
-class TakungpaoSchedule(object):
+class TakungpaoSchedule(SpiderBase):
     """大公报 爬虫调度"""
     class_lst = [
         Business,  # 商业
@@ -35,7 +37,11 @@ class TakungpaoSchedule(object):
     ]
 
     table_name = 'Takungpao'
-    name = '大公报'
+
+    def __init__(self):
+        super(TakungpaoSchedule, self).__init__()
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def ins_start(self, instance):
         instance.start()
@@ -47,7 +53,32 @@ class TakungpaoSchedule(object):
             print(f"大公报 --> {ins.name}")
             ins.start()
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):    # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+title as Title,\
+link as Website,\
+brief as Abstract, \
+article as Content, \
+source as OrgMedName, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == "__main__":
-
     TakungpaoSchedule().start()
+
+    # TakungpaoSchedule().trans_history()
+
+    pass
