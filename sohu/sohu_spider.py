@@ -12,11 +12,11 @@ file_path = os.path.abspath(os.path.join(cur_path, ".."))
 sys.path.insert(0, file_path)
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class SuhuFinance(SpiderBase):
     table_name = 'SohuFinance'
-    # dt_benchmark = 'pub_date'
 
     def __init__(self):
         super(SuhuFinance, self).__init__()
@@ -41,6 +41,8 @@ secureScore=50\
         self.save_queue = Queue()
         self.save_num = 0
         self.fields = ['pub_date', 'title', 'link', 'article']
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def _create_table(self):
         sql = '''
@@ -140,10 +142,33 @@ secureScore=50\
         self.list_item_queue.join()
         self.detail_page_queue.join()
         self.save_queue.join()
-
         print(f"入库数量: {self.save_num}")
+
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):    # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+title as Title,\
+link as Website,\
+article as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
 
 
 if __name__ == "__main__":
-    suhu = SuhuFinance()
-    suhu.start()
+    # SuhuFinance().start()
+
+    SuhuFinance().trans_history()
+
+    pass
