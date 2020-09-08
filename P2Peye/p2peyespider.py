@@ -190,8 +190,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 
 
 if __name__ == "__main__":
-    P2PEye().start()
+    # P2PEye().start()
 
-    # P2PEye().trans_history()
+    P2PEye().trans_history()
 
     pass

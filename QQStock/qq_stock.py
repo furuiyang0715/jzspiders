@@ -9,6 +9,7 @@ file_path = os.path.abspath(os.path.join(cur_path, ".."))
 sys.path.insert(0, file_path)
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class qqStock(SpiderBase):
@@ -21,7 +22,9 @@ class qqStock(SpiderBase):
                         "&ext=3911,3922,3923,3914,3913,3930,3915,3918,3908&callback=__jp1".format(self.token)
         self.fields = []
         self.table_name = "qq_Astock_news"
-        self.name = '腾讯财经[A股]'
+        # self.name = '腾讯财经[A股]'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def _create_table(self):
         sql = '''
@@ -131,6 +134,32 @@ class qqStock(SpiderBase):
         #                     item['article'] = article
         #                     print(">>>>>", item)
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):    # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+title as Title,\
+link as Website,\
+article as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == "__main__":
-    qqStock().start()
+    # qqStock().start()
+
+    qqStock().trans_history()
+
+
+    pass
