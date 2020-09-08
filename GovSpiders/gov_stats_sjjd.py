@@ -7,14 +7,17 @@ from lxml import html
 from retrying import retry
 
 from GovSpiders.base_spider import GovBaseSpider
+from scripts import utils
 
 
 class GovStatsShuJuJieDu(GovBaseSpider):
     """国家统计局爬虫 数据解读"""
     def __init__(self):
         super(GovStatsShuJuJieDu, self).__init__()
-        self.name = '数据解读'
         self.table_name = 'gov_stats'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
+
         self.first_url = "http://www.stats.gov.cn/tjsj/sjjd/index.html"
         self.format_url = "http://www.stats.gov.cn/tjsj/sjjd/index_{}.html"
         self.detail_base_url = 'http://www.stats.gov.cn/tjsj/sjjd/'
@@ -73,7 +76,6 @@ class GovStatsShuJuJieDu(GovBaseSpider):
                 # './202002/t20200217_1726708.html'
                 link = link[0].xpath('@href')[0]
                 link = urljoin(self.detail_base_url, link)
-                # print(link)
                 item['link'] = link
             item_list.append(item)
         return item_list
@@ -154,8 +156,82 @@ class GovStatsShuJuJieDu(GovBaseSpider):
             ret = self._batch_save(self.spider_client, ditems, self.table_name, self.fields)
             print("入库数量:", ret)
 
+    # - - - - - - - - - - - -  - - - - - -  - - - - - -  - - - - - -  - - - - - - - - - - - - - - - -
+    def parse_page(self, list_page):
+        try:
+            items = self._parse_page(list_page)
+        except:
+            return []
+        else:
+            return items
+
+    def _parse_page(self, list_page):
+        doc = html.fromstring(list_page)
+        lines = doc.xpath("//ul[@class='center_list_cont']/*")
+        item_list = []
+        for line in lines:
+            item = {}
+            pub_date = line.xpath(".//font[@class='cont_tit02']")
+            if not pub_date:
+                continue
+            pub_date = pub_date[0].text
+            item['PubDatetime'] = pub_date
+
+            title = line.xpath(".//font[@class='cont_tit01']")
+            if not title:
+                continue
+            title = title[0].text
+            item['Title'] = title
+
+            link = line.xpath(".//p[@class='cont_n']/a")
+            if not link:
+                continue
+            if link:
+                # http://www.stats.gov.cn/tjsj/sjjd/202002/t20200217_1726708.html
+                # './202002/t20200217_1726708.html'
+                link = link[0].xpath('@href')[0]
+                link = urljoin(self.detail_base_url, link)
+                item['Website'] = link
+            item_list.append(item)
+        return item_list
+
+    def run(self):
+        """数据进入汇总表"""
+        self._spider_init()
+        for page in range(1, 3):
+            print(">>> ", page)
+            if page == 1:
+                list_url = self.first_url
+            else:
+                list_url = self.format_url.format(page)
+            list_page = self.fetch_page(list_url)
+            ditems = []
+            if list_page:
+                items = self.parse_page(list_page)
+                for item in items:
+                    link = item['Website']
+                    detail_page = self.fetch_page(link)
+                    if detail_page:
+                        article = self.parse_detail_page(detail_page)
+                        if article:
+                            item['Content'] = article
+                            # 增加汇总表字段
+                            item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                            item['MedName'] = self.name
+                            item['OrgMedName'] = self.name
+                            item['OrgTableCode'] = self.table_code
+                            print(item)
+                            ditems.append(item)
+
+            print("爬取数量: ", len(ditems))
+            self._spider_init()
+            ret = self._batch_save(self.spider_client, ditems, self.merge_table, self.merge_fields)
+            print("入库数量:", ret)
+
 
 if __name__ == "__main__":
-    runner = GovStatsShuJuJieDu()
-    runner.start()
+    # GovStatsShuJuJieDu().start()
 
+    GovStatsShuJuJieDu().run()
+
+    pass
