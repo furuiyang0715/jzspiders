@@ -10,6 +10,7 @@ file_path = os.path.abspath(os.path.join(cur_path, ".."))
 sys.path.insert(0, file_path)
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class JuChaoInfo(SpiderBase):
@@ -39,7 +40,9 @@ class JuChaoInfo(SpiderBase):
         }
         self.fields = ['code', 'pub_date', 'title', 'category', 'summary']
         self.table_name = "juchao_info"
-        self.name = '巨潮AI资讯'
+        # self.name = '巨潮AI资讯'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def _generate_mcode(self):
         dt = str(math.floor(time.time()))
@@ -150,6 +153,33 @@ class JuChaoInfo(SpiderBase):
         for items in (zuixin_items, stock_items, fund_items, datas_items):
             save_num = self._batch_save(self.spider_client, items, self.table_name, self.fields)
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):    # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+code as SecuCode, \
+title as Title,\
+category as InnerType,\
+summary as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}_{}".format(self.table_code, data['SecuCode'], data['Title'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == "__main__":
-    JuChaoInfo().start()
+    # JuChaoInfo().start()
+
+    JuChaoInfo().trans_history()
+
+
+    pass
