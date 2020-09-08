@@ -11,18 +11,19 @@ sys.path.insert(0, file_path)
 
 from gne import GeneralNewsExtractor
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class NetEaseMoney(SpiderBase):
-    table_name = "netease_money"
-    # dt_benchmark = 'pub_date'
-
     def __init__(self):
         super(NetEaseMoney, self).__init__()
         self.list_url = "http://money.163.com/special/00251G8F/news_json.js"
         self.extractor = GeneralNewsExtractor()
         self.fields = ['pub_date', 'title', 'link', 'article']
-        self.name = '网易财经'
+        # self.name = '网易财经'
+        self.table_name = "netease_money"
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def _parse_list(self, body):
         js_obj = re.findall(r"news:(.*)\};", body)[0]
@@ -97,6 +98,31 @@ class NetEaseMoney(SpiderBase):
             print(len(items))
             print(ret)
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):  # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+title as Title,\
+link as Website,\
+article as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == "__main__":
     NetEaseMoney().start()
+
+    # NetEaseMoney().trans_history()
+
+    pass
