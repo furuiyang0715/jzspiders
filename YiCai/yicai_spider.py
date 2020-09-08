@@ -6,11 +6,12 @@ import sys
 import requests
 from lxml import html
 
-from base_spider import SpiderBase
-
 cur_path = os.path.split(os.path.realpath(__file__))[0]
 file_path = os.path.abspath(os.path.join(cur_path, ".."))
 sys.path.insert(0, file_path)
+
+from base_spider import SpiderBase
+from scripts import utils
 
 
 class YiCai(SpiderBase):
@@ -18,8 +19,10 @@ class YiCai(SpiderBase):
         super(YiCai, self).__init__()
         self.index_url = 'https://www.yicai.com/'
         self.url = 'https://www.yicai.com/api/ajax/getlatest?page={}&pagesize=25'
-        self.name = '第一财经新闻'
         self.table_name = 'NewsYicai'
+        # self.name = '第一财经新闻'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
         self.fields = ['pub_date', 'author', 'source', 'title', 'link', 'article']
 
     def fetch_detail_page(self, url):
@@ -90,6 +93,33 @@ class YiCai(SpiderBase):
             ret = self._batch_save(self.spider_client, items, self.table_name, self.fields)
             print(f'{self.name} 本页入库个数{ret}')
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):  # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+source as OrgMedName, \
+title as Title,\
+link as Website,\
+article as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                if not data['OrgMedName']:
+                    data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == "__main__":
-    YiCai().start()
+    # YiCai().start()
+
+    YiCai().trans_history()
+
+    pass
