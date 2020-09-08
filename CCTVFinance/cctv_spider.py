@@ -63,6 +63,7 @@ class CCTVFinance(SpiderBase):
         return content
 
     def start(self):
+        """单独成表"""
         self._create_table()
         resp = requests.get(self.url, headers=self.headers)
         items = []
@@ -87,6 +88,36 @@ class CCTVFinance(SpiderBase):
                     item['article'] = content
                     items.append(item)
                     ret = self._save(self.spider_client, item, self.table_name, self.fields)
+
+    def run(self):
+        """入汇总表"""
+        self._spider_init()
+        resp = requests.get(self.url, headers=self.headers)
+        if resp.status_code == 200:
+            body = resp.text.encode("ISO-8859-1").decode("utf-8")
+            datas_str = re.findall(r"economy\((.*)\)", body)[0]
+            datas = json.loads(datas_str).get("data").get("list")
+
+            for data in datas:
+                item = dict()
+                item['PubDatetime'] = data.get("focus_date")
+                item['Title'] = data.get("title")
+                item['KeyWords'] = data.get("keywords")
+                link = data.get("url")
+                item['Website'] = link
+                item['Abstract'] = data.get('brief')
+                try:
+                    content = self.parse_detail(link)
+                except:
+                    content = None
+                if content:
+                    item['Content'] = content
+                    # 汇总表附加字段
+                    item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                    item['MedName'] = self.name
+                    item['OrgMedName'] = self.name
+                    item['OrgTableCode'] = self.table_code
+                    self._save(self.spider_client, item, self.merge_table, self.merge_fields)
 
     def trans_history(self):
         self._spider_init()
@@ -115,4 +146,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 if __name__ == "__main__":
     # CCTVFinance().start()
 
-    CCTVFinance().trans_history()
+    # CCTVFinance().trans_history()
+
+    CCTVFinance().run()
+
+    pass

@@ -93,6 +93,7 @@ class SpiderBase(object):
             'CreateTime',  # 创建时间
             'UpdateTime',   # 更新时间
         ]
+        self.merge_table = 'OriginSpiderAll'
 
     # 数据库连接初始化
     def _dc_init(self):
