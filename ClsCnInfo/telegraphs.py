@@ -86,6 +86,55 @@ app=CailianpressWeb\
             ret = self._batch_save(self.spider_client, items, self.table_name, self.fields)
             print(f"next 抓取数量{len(items)};入库数量{ret}")
 
+    def _refresh(self, url):
+        resp = requests.get(url, headers=self.headers, verify=False, timeout=10)
+        if resp.status_code == 200:
+            py_data = json.loads(resp.text)
+            infos = py_data.get("data").get('roll_data')
+            if not infos:
+                return
+            items = []
+            for info in infos:
+                item = {}
+                title = info.get("title")
+                if not title:
+                    title = info.get("content")[:20]
+                item['Title'] = title[:30]
+                pub_date = info.get("ctime")
+                content = info.get("content")
+                item['PubDatetime'] = self.convert_dt(pub_date)
+                item['Content'] = content
+                # 增加汇总表字段
+                item['DupField'] = "{}_{}".format(self.table_code, item['Title'])
+                item['MedName'] = self.name
+                item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
+                print(item)
+                items.append(item)
+            # 拿到本次最后一条新闻的时间
+            dt = infos[-1].get('ctime')
+            return items, dt
+
+    def run(self):
+        self._spider_init()
+        _ts = int(time.time())
+        first_url = self.url_format.format(_ts, _ts)
+        items, last_dt = self._refresh(first_url)
+        ret = self._batch_save(self.spider_client, items, self.merge_table, self.merge_fields)
+        print(f"first 抓取数量{len(items)};入库数量{ret}")
+
+        # 根据需要多久之前的数据,确定刷新的截止时间 cutoff_dt
+        cutoff_dt = int((datetime.datetime.now() - datetime.timedelta(days=10)).timestamp())
+        while last_dt > cutoff_dt:
+            next_url = self.url_format.format(last_dt, last_dt)
+            res = self._refresh(next_url)
+            if res:
+                items, last_dt = res
+            else:
+                return
+            ret = self._batch_save(self.spider_client, items, self.merge_table, self.merge_fields)
+            print(f"next 抓取数量{len(items)};入库数量{ret}")
+
     def _create_table(self):
         self._spider_init()
         create_sql = '''
@@ -128,4 +177,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
 if __name__ == "__main__":
     # Telegraphs().start()
 
-    Telegraphs().trans_history()
+    # Telegraphs().trans_history()
+
+    Telegraphs().run()
+
+    pass

@@ -76,7 +76,7 @@ class SpiderBase(object):
         }
 
         self.merge_fields = [
-            'id',  # 自增 ID
+            # 'ID',
             'PubDatetime',    # 对应于网站的发布时间 pub_date
             'MedName',  # 资讯来源，网站名称，类似于 "巨潮快讯"、"财联社" 等 ...
             'Title',  # 文章标题，对应于分表中的 title
@@ -90,8 +90,8 @@ class SpiderBase(object):
             'InnerType',  # 内部资讯类别
             'KeyWords',  # 文章关键词
             'DupField',  # 去重标志字段
-            'CreateTime',  # 创建时间
-            'UpdateTime',   # 更新时间
+            # 'CreateTime',  # 创建时间
+            # 'UpdateTime',   # 更新时间
         ]
         self.merge_table = 'OriginSpiderAll'
 
