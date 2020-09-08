@@ -9,7 +9,6 @@ class GovStatsXinWenFaBuHui(GovStatsShuJuJieDu):
     """ 国家统计局爬虫 新闻发布会 """
     def __init__(self):
         super(GovStatsXinWenFaBuHui, self).__init__()
-        self.name = '新闻发布会'
         self.first_url = "http://www.stats.gov.cn/tjsj/xwfbh/fbhwd/index.html"
         self.format_url = "http://www.stats.gov.cn/tjsj/xwfbh/fbhwd/index_{}.html"
         self.detail_base_url = "http://www.stats.gov.cn/tjsj"

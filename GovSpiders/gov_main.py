@@ -117,7 +117,7 @@ from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
 if __name__ == "__main__":
     # ChinaBankSchedule().start()
     # ChinaBankSchedule().trans_history()
-    # ChinaBankSchedule().run()
+    ChinaBankSchedule().run()
 
     # GovStatsSchedule().start()
     # GovStatsSchedule().trans_history()

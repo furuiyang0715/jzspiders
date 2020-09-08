@@ -11,7 +11,6 @@ class GovStatsTongJiDongTai(GovStatsShuJuJieDu):
     """国家统计局爬虫 统计动态"""
     def __init__(self):
         super(GovStatsTongJiDongTai, self).__init__()
-        self.name = '统计动态'
         self.first_url = "http://www.stats.gov.cn/tjgz/tjdt/index.html"
         self.format_url = "http://www.stats.gov.cn/tjgz/tjdt/index_{}.html"
         self.detail_base_url = "http://www.stats.gov.cn/tjgz/tjdt/"

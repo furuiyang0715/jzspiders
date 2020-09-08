@@ -198,6 +198,7 @@ class GovStatsShuJuJieDu(GovBaseSpider):
     def run(self):
         """数据进入汇总表"""
         self._spider_init()
+
         for page in range(1, 3):
             print(">>> ", page)
             if page == 1:
@@ -205,7 +206,7 @@ class GovStatsShuJuJieDu(GovBaseSpider):
             else:
                 list_url = self.format_url.format(page)
             list_page = self.fetch_page(list_url)
-            ditems = []
+            # ditems = []
             if list_page:
                 items = self.parse_page(list_page)
                 for item in items:
@@ -221,12 +222,13 @@ class GovStatsShuJuJieDu(GovBaseSpider):
                             item['OrgMedName'] = self.name
                             item['OrgTableCode'] = self.table_code
                             print(item)
-                            ditems.append(item)
+                            self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+                            # ditems.append(item)
 
-            print("爬取数量: ", len(ditems))
-            self._spider_init()
-            ret = self._batch_save(self.spider_client, ditems, self.merge_table, self.merge_fields)
-            print("入库数量:", ret)
+            # print("爬取数量: ", len(ditems))
+            # self._spider_init()
+            # ret = self._batch_save(self.spider_client, ditems, self.merge_table, self.merge_fields)
+            # print("入库数量:", ret)
 
 
 if __name__ == "__main__":
