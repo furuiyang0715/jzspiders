@@ -5,6 +5,7 @@ from gne import GeneralNewsExtractor
 from lxml import html
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class Reference(SpiderBase):
@@ -31,6 +32,8 @@ class Reference(SpiderBase):
         self.fields = ['link', 'title', 'pub_date', 'article']
         self.max_page = 2
         self.type = '巨丰内参'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def get(self, url):
         return requests.get(url, headers=self.headers)
@@ -141,6 +144,94 @@ class Reference(SpiderBase):
                 more_page = more_resp.text
                 items = self._parse_more(more_page)
                 page_save_num = self._batch_save(self.spider_client, items, self.table_name, self.fields)
+                print(f"当前页 {num} 入库的个数是 {page_save_num}")
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def parse_index(self, index_page):
+        doc = html.fromstring(index_page)
+        news_list = doc.xpath("//div[@class='m-contentl left']//dl")
+        items = []
+        for news in news_list:
+            item = {}
+            title = news.xpath(".//a[@class='f20']/text()")[0]
+            item['Title'] = title
+            link = news.xpath(".//a[@class='f20']/@href")[0]
+            item['Website'] = link
+
+            _year = None
+            try:
+                _year = re.findall(r"news/(\d+)/", link)[0][:4]  # 20161218
+            except:
+                pass
+
+            pub_date = news.xpath(".//dd/span/text()")[0]
+            pub_date = self._process_pub_dt(pub_date, _year)
+            item['PubDatetime'] = pub_date
+            detail_resp = self.get(link)
+            if detail_resp:
+                detail_page = detail_resp.text
+                article = self._parse_detail(detail_page)
+                item['Content'] = article
+
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
+
+                items.append(item)
+        return items
+
+    def parse_more(self, more_page):
+        append_datas = eval(re.findall(r"append\((.*?)\);", more_page)[0])
+        doc = html.fromstring(append_datas)
+        news_list = doc.xpath(".//div[@class='slide']")
+        items = []
+        for news in news_list:
+            item = {}
+            title = news.xpath(".//a[@class='f20']/text()")[0].strip()
+            item['Title'] = title
+            link = news.xpath(".//a[@class='f20']/@href")[0]
+            item['Website'] = link
+            # 根据规律从 link 中获取当前的年份
+            _year = None
+            try:
+                _year = re.findall(r"news/(\d+)/", link)[0][:4]  # 20161218
+            except:
+                pass
+            pub_date = news.xpath(".//span/text()")[0].strip()
+            pub_date = self._process_pub_dt(pub_date, _year)
+            item['PubDatetime'] = pub_date
+            detail_resp = self.get(link)
+            if detail_resp:
+                detail_page = detail_resp.text
+                article = self._parse_detail(detail_page)
+                item['Content'] = article
+
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
+            items.append(item)
+        return items
+
+    def run(self):
+        self._spider_init()
+        index_resp = self.get(self.index_url)
+        if index_resp and index_resp.status_code == 200:
+            index_page = index_resp.text
+            index_items = self.parse_index(index_page)
+            page_save_num = self._batch_save(self.spider_client, index_items, self.merge_table,
+                                             self.merge_fields)
+            print(f"首页入库的个数是 {page_save_num}")
+
+        for num in range(1, self.max_page + 1):
+            more_url = self.more_url.format(num)
+            more_resp = self.get(more_url)
+            if more_resp and more_resp.status_code == 200:
+                more_page = more_resp.text
+                items = self.parse_more(more_page)
+                page_save_num = self._batch_save(self.spider_client, items, self.merge_table,
+                                                 self.merge_fields)
                 print(f"当前页 {num} 入库的个数是 {page_save_num}")
 
 

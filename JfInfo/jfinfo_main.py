@@ -39,7 +39,7 @@ class JFSchedule(SpiderBase):
         for cls in self.class_lst:
             ins = cls()
             print(f"巨丰财经 --> {ins.type}")
-            ins.start()
+            ins.run()
 
     def trans_history(self):
         self._spider_init()
