@@ -30,7 +30,7 @@ class Reference(SpiderBase):
         self.table_name = 'jfinfo'    # 巨丰资讯
         self.fields = ['link', 'title', 'pub_date', 'article']
         self.max_page = 2
-        self.name = '巨丰内参'
+        self.type = '巨丰内参'
 
     def get(self, url):
         return requests.get(url, headers=self.headers)
@@ -149,7 +149,7 @@ class HKInfo(Reference):
         super(HKInfo, self).__init__()
         self.index_url = 'http://www.jfinfo.com/reference/HK'
         self.more_url = 'http://www.jfinfo.com/articles_categories/more?page={}&category_id=83'
-        self.name = '港股资讯'
+        self.type = '港股资讯'
 
 
 class Research(Reference):
@@ -157,7 +157,7 @@ class Research(Reference):
         super(Research, self).__init__()
         self.index_url = 'http://www.jfinfo.com/research'
         self.more_url = 'http://www.jfinfo.com/articles_categories/more?page={}&category_id=23'
-        self.name = '巨丰研究院'
+        self.type = '巨丰研究院'
 
 
 class TZZJY(Reference):
@@ -165,4 +165,4 @@ class TZZJY(Reference):
         super(TZZJY, self).__init__()
         self.index_url = 'http://www.jfinfo.com/reference/tzzjy'
         self.more_url = 'http://www.jfinfo.com/articles_categories/more?page={}&category_id=59'
-        self.name = '投资者教育'
+        self.type = '投资者教育'

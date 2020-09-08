@@ -32,7 +32,13 @@ class JFSchedule(SpiderBase):
     def start(self):
         for cls in self.class_lst:
             ins = cls()
-            print(f"巨丰财经 --> {ins.name}")
+            print(f"巨丰财经 --> {ins.type}")
+            ins.start()
+
+    def run(self):
+        for cls in self.class_lst:
+            ins = cls()
+            print(f"巨丰财经 --> {ins.type}")
             ins.start()
 
     def trans_history(self):
@@ -60,4 +66,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
 if __name__ == "__main__":
     # JFSchedule().start()
 
-    JFSchedule().trans_history()
+    # JFSchedule().trans_history()
+
+    JFSchedule().run()
+
+    pass
