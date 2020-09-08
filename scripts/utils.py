@@ -41,6 +41,8 @@ org_tablecode_map = {
 
     'xueqiu_livenews': ['雪球快讯', 1074, ],
 
+    'taoguba': ['淘股吧', 1006, ]
+
 }
 
 
