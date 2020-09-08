@@ -9,6 +9,8 @@ sys.path.insert(0, file_path)
 
 from StockStcn import stcn_utils as utils
 from StockStcn.base_stcn import STCNBase
+from base_spider import SpiderBase
+from scripts import utils as sc_utils
 
 
 class STCNKuaixun(STCNBase):
@@ -377,7 +379,7 @@ if __name__ == "__main__":
     pass
 
 
-class STCNSchedule(object):
+class STCNSchedule(SpiderBase):
     class_lst = [
         STCNKuaixun,
         STCNEgs,
@@ -396,8 +398,12 @@ class STCNSchedule(object):
     ]
 
     table_name = "stcn_info"
-    # dt_benchmark = 'pub_date'
-    name = '上海证券报'
+    # name = '证券时报网'
+
+    def __init__(self):
+        super(STCNSchedule, self).__init__()
+        info = sc_utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def ins_start(self, instance):
         instance.start()
@@ -408,6 +414,32 @@ class STCNSchedule(object):
             print(f"{ins.name}")
             ins.start()
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):    # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+code as SecuCode, \
+title as Title,\
+link as Website,\
+article as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == "__main__":
-    STCNSchedule().start()
+    # STCNSchedule().start()
+
+    STCNSchedule().trans_history()
+
+    pass
