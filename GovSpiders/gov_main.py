@@ -10,16 +10,23 @@ from GovSpiders.gov_stats_sjjd import GovStatsShuJuJieDu
 from GovSpiders.gov_stats_tjdt import GovStatsTongJiDongTai
 from GovSpiders.gov_stats_xwfbh import GovStatsXinWenFaBuHui
 from GovSpiders.gov_stats_zxfb import GovStatsZuiXinFaBu
+from scripts import utils
+from base_spider import SpiderBase
 
 
-class ChinaBankSchedule(object):
+class ChinaBankSchedule(SpiderBase):
     class_lst = [
         ChinaBankShuJuJieDu,
         ChinaBankXinWenFaBu
     ]
 
     table_name = 'chinabank'
-    name = '中国银行'
+    # name = '中国银行'
+
+    def __init__(self):
+        super(ChinaBankSchedule, self).__init__()
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def ins_start(self, instance):
         instance.start()
@@ -32,7 +39,7 @@ class ChinaBankSchedule(object):
             ins.start()
 
 
-class GovStatsSchedule(object):
+class GovStatsSchedule(SpiderBase):
     class_lst = [
         GovStatsShuJuJieDu,
         GovStatsTongJiDongTai,
@@ -41,7 +48,12 @@ class GovStatsSchedule(object):
     ]
 
     table_name = 'gov_stats'
-    name = '国家统计局'
+    # name = '国家统计局'
+
+    def __init__(self):
+        super(GovStatsSchedule, self).__init__()
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def start(self):
         """顺次运行"""
@@ -53,4 +65,7 @@ class GovStatsSchedule(object):
 
 if __name__ == "__main__":
     ChinaBankSchedule().start()
+
     GovStatsSchedule().start()
+
+    pass
