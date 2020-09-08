@@ -111,7 +111,11 @@ class EEOSpider(SpiderBase):
     def get_detail(self, url, is_api=False):
         resp = requests.get(url, headers=self.headers)
         if resp and resp.status_code == 200:
-            body = resp.text.encode("ISO-8859-1").decode("utf-8")
+            try:
+                body = resp.text.encode("ISO-8859-1").decode("utf-8")
+            except:
+                return
+
             doc = html.fromstring(body)
             try:
                 article = doc.xpath(".//div[@class='xx_boxsing']")[0]
@@ -254,19 +258,24 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 
                 elif isinstance(ret, str):
                     item = {
-                        'link': link,
-                        'title': title,
-                        'article': ret,
+                        'Website': link,
+                        'Title': title,
+                        'Content': ret,
                     }
 
                 else:   # isinstance(ret, tuple):
                     item = {
-                        'link': link,
-                        'title': title,
-                        'author': ret[0],
-                        'pub_date': ret[1],
-                        'article': ret[2],
+                        'Website': link,
+                        'Title': title,
+                        # 'author': ret[0],
+                        'PubDatetime': ret[1],
+                        'Content': ret[2],
                     }
+                # 增加汇总表字段
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
                 print(item)
                 items.append(item)
             return items
@@ -290,16 +299,21 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
                 item = {}
                 pub_ts = int(one.get("published"))
                 pub_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(pub_ts))
-                item['pub_date'] = pub_date
+                item['PubDatetime'] = pub_date
                 title = one.get("title")
                 if len(title) > 64:
                     title = title[:64]
-                item['title'] = title
-                item['author'] = one.get("author")
+                item['Title'] = title
+                # item['author'] = one.get("author")
                 link = one.get("url")
-                item['link'] = link
+                item['Website'] = link
                 article = self.get_detail(link, is_api=True)
-                item['article'] = article
+                item['Content'] = article
+                # 增加汇总表字段
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
                 print(item)
                 items.append(item)
             return items
