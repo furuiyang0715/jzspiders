@@ -150,7 +150,7 @@ class Reference(SpiderBase):
     def parse_index(self, index_page):
         doc = html.fromstring(index_page)
         news_list = doc.xpath("//div[@class='m-contentl left']//dl")
-        items = []
+        # items = []
         for news in news_list:
             item = {}
             title = news.xpath(".//a[@class='f20']/text()")[0]
@@ -177,15 +177,15 @@ class Reference(SpiderBase):
                 item['MedName'] = self.name
                 item['OrgMedName'] = self.name
                 item['OrgTableCode'] = self.table_code
-
-                items.append(item)
-        return items
+                self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+                # items.append(item)
+        # return items
 
     def parse_more(self, more_page):
         append_datas = eval(re.findall(r"append\((.*?)\);", more_page)[0])
         doc = html.fromstring(append_datas)
         news_list = doc.xpath(".//div[@class='slide']")
-        items = []
+        # items = []
         for news in news_list:
             item = {}
             title = news.xpath(".//a[@class='f20']/text()")[0].strip()
@@ -211,8 +211,9 @@ class Reference(SpiderBase):
                 item['MedName'] = self.name
                 item['OrgMedName'] = self.name
                 item['OrgTableCode'] = self.table_code
-            items.append(item)
-        return items
+                self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+            # items.append(item)
+        # return items
 
     def run(self):
         self._spider_init()
@@ -220,9 +221,9 @@ class Reference(SpiderBase):
         if index_resp and index_resp.status_code == 200:
             index_page = index_resp.text
             index_items = self.parse_index(index_page)
-            page_save_num = self._batch_save(self.spider_client, index_items, self.merge_table,
-                                             self.merge_fields)
-            print(f"首页入库的个数是 {page_save_num}")
+            # page_save_num = self._batch_save(self.spider_client, index_items, self.merge_table,
+            #                                  self.merge_fields)
+            # print(f"首页入库的个数是 {page_save_num}")
 
         for num in range(1, self.max_page + 1):
             more_url = self.more_url.format(num)
@@ -230,9 +231,9 @@ class Reference(SpiderBase):
             if more_resp and more_resp.status_code == 200:
                 more_page = more_resp.text
                 items = self.parse_more(more_page)
-                page_save_num = self._batch_save(self.spider_client, items, self.merge_table,
-                                                 self.merge_fields)
-                print(f"当前页 {num} 入库的个数是 {page_save_num}")
+                # page_save_num = self._batch_save(self.spider_client, items, self.merge_table,
+                #                                  self.merge_fields)
+                # print(f"当前页 {num} 入库的个数是 {page_save_num}")
 
 
 class HKInfo(Reference):
