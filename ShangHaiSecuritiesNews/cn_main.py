@@ -7,9 +7,11 @@ sys.path.insert(0, file_path)
 
 from ShangHaiSecuritiesNews.cn_4_hours import CN4Hours
 from ShangHaiSecuritiesNews.cn_hongguan import CNStock
+from base_spider import SpiderBase
+from scripts import utils
 
 
-class CNSchedule(object):
+class CNSchedule(SpiderBase):
     """上海证券报 爬虫调度"""
     class_lst = [
         CN4Hours,  # 上证 4 小时
@@ -17,8 +19,12 @@ class CNSchedule(object):
     ]
 
     table_name = 'cn_stock'
-    # dt_benchmark = 'pub_date'
-    name = '上海证券报'
+    # name = '上海证券报'
+    info = utils.org_tablecode_map.get(table_name)
+    name, table_code = info[0], info[1]
+
+    def __init__(self):
+        super(CNSchedule, self).__init__()
 
     def ins_start(self, instance):
         instance.start()
