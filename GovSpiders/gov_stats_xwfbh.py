@@ -36,7 +36,27 @@ class GovStatsXinWenFaBuHui(GovStatsShuJuJieDu):
         pub_date = re.findall("发布时间：(\d{4}-\d{2}-\d{2})", ret)[0]
         return pub_date
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def _parse_page(self, list_page):
+        doc = html.fromstring(list_page)
+        ret = doc.xpath("//div[@class='center_list']/ul[@class='center_list_contlist']")
+        lines = ret[0].xpath("./li/span[@class='cont_tit']//font[@class='cont_tit03']/*")
+        item_list = []
+        for line in lines:
+            item = {}
+            link = line.xpath("./@href")[0]
+            link = link.replace("../..", "http://www.stats.gov.cn/tjsj")
+            item['Website'] = link
+            detail_page = self.fetch_page(link)
+            item['PubDatetime'] = self._parse_detail_pub_date(detail_page)
+            item['Title'] = line.text_content()
+            item_list.append(item)
+        return item_list
+
 
 if __name__ == "__main__":
-    runner = GovStatsXinWenFaBuHui()
-    runner.start()
+    # GovStatsXinWenFaBuHui().start()
+
+    GovStatsXinWenFaBuHui().run()
+
+    pass
