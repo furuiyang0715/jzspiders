@@ -11,6 +11,7 @@ file_path = os.path.abspath(os.path.join(cur_path, ".."))
 sys.path.insert(0, file_path)
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class XueQiuKuaiXun(SpiderBase):
@@ -24,7 +25,9 @@ class XueQiuKuaiXun(SpiderBase):
             'Cookie': 's=dk1af2e0xx; device_id=225b7001f44831dd2c0ef9a0a27c309c; __utma=1.390898764.1595042617.1595042617.1595042617.1; __utmz=1.1595042617.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); aliyungf_tc=AQAAADZ1qkEJjAIA4U5tcaMBWxG5jhDi; xq_a_token=4db837b914fc72624d814986f5b37e2a3d9e9944; xqat=4db837b914fc72624d814986f5b37e2a3d9e9944; xq_r_token=2d6d6cc8e57501dfe571d2881cabc6a5f2542bf8; xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOi0xLCJpc3MiOiJ1YyIsImV4cCI6MTYwMDQ4MzAwNywiY3RtIjoxNTk3OTE1NjU0NjMzLCJjaWQiOiJkOWQwbjRBWnVwIn0.Xv18aNMnTCbBSBdBeEBlebGCJRVna9F89ghYs2iTc2zXztEJJ6az2lWMX7E78Nt1aVY97kPhNMs0IcCtHWX7WOX3xqZMUQpUi_ZbDTv7vUoOIBKB27jtenSkM6i_u3pgDrVvyXngbcnof-zKv86LzfcgQSCL3GcnmtwHFmoXctumpD8Z400r3m753u7uNnFOptyGJaIDIqvcF6vlBjm01b18WwYrkjIcW3ujJPGkTr38O9FYujILUQjCdRQZsTgEQfK3bPWeOJNFd8V9rMXl0tZlYN7m1yhL1DYeMqyTvCY5rvkzUQ6cWyBJJZ615auqmflzwe__i-reu-6D_6U53w; u=561597915688189; Hm_lvt_1db88642e346389874251b5a1eded6e3=1597915690,1597990683; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1597990683',
         }
         self.table_name = 'xueqiu_livenews'
-        self.name = '雪球快讯'
+        # self.name = '雪球快讯'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
         self.fields = ['link', 'pub_date', 'text']
 
     def _create_table(self):
@@ -79,6 +82,30 @@ class XueQiuKuaiXun(SpiderBase):
             next_url = self.fetch_datas(next_url)
             time.sleep(1)
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):  # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+link as Website,\
+text as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['id'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == '__main__':
-    XueQiuKuaiXun().start()
+    # XueQiuKuaiXun().start()
+
+    XueQiuKuaiXun().trans_history()
+
+    pass
