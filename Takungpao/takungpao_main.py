@@ -59,7 +59,6 @@ class TakungpaoSchedule(SpiderBase):
             trans_sql = '''select pub_date as PubDatetime,\
 title as Title,\
 link as Website,\
-brief as Abstract, \
 article as Content, \
 source as OrgMedName, \
 CREATETIMEJZ as CreateTime, \
@@ -72,13 +71,15 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
             for data in datas:
                 data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
                 data['MedName'] = self.name
+                if not data['OrgMedName']:
+                    data['OrgMedName'] = self.name
                 data['OrgTableCode'] = self.table_code
                 self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
 
 
 if __name__ == "__main__":
-    TakungpaoSchedule().start()
+    # TakungpaoSchedule().start()
 
-    # TakungpaoSchedule().trans_history()
+    TakungpaoSchedule().trans_history()
 
     pass
