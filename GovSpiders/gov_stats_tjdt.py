@@ -47,7 +47,43 @@ class GovStatsTongJiDongTai(GovStatsShuJuJieDu):
             item_list.append(item)
         return item_list
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def _parse_page(self, list_page):
+        doc = html.fromstring(list_page)
+        lines = doc.xpath("//ul[@class='center_list_contlist']/*")
+        item_list = []
+        for line in lines:
+            item = {}
+            pub_date = line.xpath(".//font[@class='cont_tit02']")
+            if not pub_date:
+                continue
+            pub_date = pub_date[0].text
+            item['PubDatetime'] = pub_date
+
+            title = line.xpath(".//font[@class='cont_tit03']")
+            if not title:
+                continue
+            title = title[0].text
+            item['Title'] = title
+
+            link = line.xpath("./a")
+            if not link:
+                continue
+            if link:
+                link = link[0].xpath('@href')[0]
+                # http://www.stats.gov.cn/tjgz/tjdt/201912/t20191213_1717372.html
+                # print(link)  # './201912/t20191213_1717372.html'
+                link = urljoin(self.detail_base_url, link)
+                item['Website'] = link
+            # print(item)
+            item_list.append(item)
+        return item_list
+
 
 if __name__ == "__main__":
-    runner = GovStatsTongJiDongTai()
-    runner.start()
+    # GovStatsTongJiDongTai().start()
+
+    GovStatsTongJiDongTai().run()
+
+    pass
