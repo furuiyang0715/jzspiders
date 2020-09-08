@@ -11,6 +11,7 @@ sys.path.insert(0, file_path)
 
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class SecuritiesDaily(SpiderBase):
@@ -19,8 +20,10 @@ class SecuritiesDaily(SpiderBase):
         self.list_url = 'http://www.zqrb.cn/stock/zuixinbobao/'
         self.extractor = GeneralNewsExtractor()
         self.list_url_base = 'http://www.zqrb.cn/stock/zuixinbobao/index_p{}.html'
-        self.name = '证券日报网-最新播报'
         self.table_name = 'securities_daily_latest'
+        # self.name = '证券日报网-最新播报'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
         self.fields = ['pub_date', 'title', 'type', 'link', 'content']
 
     def parse_detail(self, link):
@@ -88,6 +91,28 @@ class SecuritiesDaily(SpiderBase):
                     items.append(item)
                 self._batch_save(self.spider_client, items, self.table_name, self.fields)
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):    # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+title as Title,\
+link as Website,\
+type as InnerType, \
+content as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 def temp():
     _str = '快讯：10：00民航机场涨3%  7只个股均获超1000万元大单抢筹'
@@ -96,4 +121,9 @@ def temp():
 
 if __name__ == '__main__':
     # temp()
-    SecuritiesDaily().start()
+
+    # SecuritiesDaily().start()
+
+    SecuritiesDaily().trans_history()
+
+    pass
