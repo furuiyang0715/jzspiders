@@ -167,8 +167,98 @@ from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
                 data['OrgTableCode'] = self.table_code
                 self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def _get_list(self, url):
+        resp = requests.get(url, headers=self.headers)
+        if resp and resp.status_code == 200:
+            body = resp.text
+            doc = html.fromstring(body)
+            news_list = doc.xpath(".//div[@id='hotspot_list_box']")
+            if news_list:
+                news_list = news_list[0]
+                boxs1 = news_list.xpath(".//div[@class='channel  clearfix list-box']")
+                boxs2 = news_list.xpath(".//div[@class='channel clearfix list-box']")
+                boxs1.extend(boxs2)
+                for box in boxs1:
+                    info = box.xpath(".//div[@class='channel_one']/span[@class='f24 fb']/a")[0]
+                    link = info.xpath("./@href")[0]
+                    article = self.get_detail(link)
+                    if article:
+                        title = info.text_content()
+                        pub_str = box.xpath(".//p[@class='list-info gray01']")[0]
+                        pub_str = pub_str.text_content().strip()
+                        pub_date = re.findall("\d{2}-\d{2} \d{2}:\d{2}", pub_str)[0]
+                        pub_date = str(datetime.datetime.now().year) + "-" + pub_date
+                        item = dict()
+                        item['Website'] = link
+                        item['Title'] = title
+                        item['PubDatetime'] = pub_date
+                        item['Content'] = article
+                        # 增加合并表的字段
+                        item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                        item['MedName'] = self.name
+                        item['OrgMedName'] = self.name
+                        item['OrgTableCode'] = self.table_code
+                        self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
+    def _get_zhuanlan(self, url):
+        resp = requests.get(url, headers=self.headers)
+        if resp and resp.status_code == 200:
+            body = resp.text
+            doc = html.fromstring(body)
+            boxs = doc.xpath(".//div[@class='article mt64']")
+            if boxs:
+                boxs = boxs[0]
+                boxs = boxs.xpath(".//div[@class='channel pb32 clearfix mt48']")
+                if boxs:
+                    for box in boxs:
+                        info = box.xpath(".//h2[@class='f24 fb']/a")[0]
+                        title = info.text_content()
+                        link = info.xpath("./@href")[0]
+                        article = self.get_detail(link)
+                        if article:
+                            pub_str = box.xpath(".//p[@class='list-info gray01']")[0]
+                            pub_str = pub_str.text_content().strip()
+                            pub_date = re.findall("\d{2}-\d{2} \d{2}:\d{2}", pub_str)[0]
+                            pub_date = str(datetime.datetime.now().year) + "-" + pub_date
+                            item = dict()
+                            item['Website'] = link
+                            item['Title'] = title
+                            item['PubDatetime'] = pub_date
+                            item['Content'] = article
+                            # 增加合并表的字段
+                            item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                            item['MedName'] = self.name
+                            item['OrgMedName'] = self.name
+                            item['OrgTableCode'] = self.table_code
+                            print(item)
+                            self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
+    def run(self):
+        self._spider_init()
+
+        # 爬取早晚评
+        for page_num in range(1, 3):
+            url = self.format_url.format(page_num)
+            self._get_list(url)
+
+        # 爬取热点追踪
+        self._get_list(self.web_url2)
+
+        # 爬取专栏作者
+        zhuanlan_links = self.get_authors()
+        if zhuanlan_links:
+            for zlink in zhuanlan_links:
+                print(zlink)
+                self._get_zhuanlan(zlink)
+
 
 if __name__ == "__main__":
     # PingLun9666().start()
 
-    PingLun9666().trans_history()
+    # PingLun9666().trans_history()
+
+    PingLun9666().run()
+
+    pass
