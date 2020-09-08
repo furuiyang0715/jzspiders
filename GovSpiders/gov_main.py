@@ -35,8 +35,13 @@ class ChinaBankSchedule(SpiderBase):
         """顺次运行"""
         for cls in self.class_lst:
             ins = cls()
-            print(f"中国银行 --> {ins.name}")
             ins.start()
+
+    def run(self):
+        """进入汇总表"""
+        for cls in self.class_lst:
+            ins = cls()
+            ins.run()
 
     def trans_history(self):
         self._spider_init()
@@ -69,7 +74,6 @@ class GovStatsSchedule(SpiderBase):
     ]
 
     table_name = 'gov_stats'
-    # name = '国家统计局'
 
     def __init__(self):
         super(GovStatsSchedule, self).__init__()
@@ -80,8 +84,13 @@ class GovStatsSchedule(SpiderBase):
         """顺次运行"""
         for cls in self.class_lst:
             ins = cls()
-            print(f"中国银行 --> {ins.name}")
             ins.start()
+
+    def run(self):
+        """进入汇总表"""
+        for cls in self.class_lst:
+            ins = cls()
+            ins.run()
 
     def trans_history(self):
         self._spider_init()
@@ -107,9 +116,11 @@ from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
 
 if __name__ == "__main__":
     # ChinaBankSchedule().start()
-    ChinaBankSchedule().trans_history()
+    # ChinaBankSchedule().trans_history()
+    # ChinaBankSchedule().run()
 
     # GovStatsSchedule().start()
-    GovStatsSchedule().trans_history()
+    # GovStatsSchedule().trans_history()
+    GovStatsSchedule().run()
 
     pass

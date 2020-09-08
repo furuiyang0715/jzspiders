@@ -2,6 +2,7 @@ from lxml import html
 from retrying import retry
 
 from GovSpiders.base_spider import GovBaseSpider
+from scripts import utils
 
 
 class ChinaBankMixin(object):
@@ -79,10 +80,11 @@ class ChinaBankMixin(object):
 class ChinaBankShuJuJieDu(GovBaseSpider, ChinaBankMixin):
     def __init__(self):
         super(ChinaBankShuJuJieDu, self).__init__()
-        self.name = '中国银行-数据解读'
-        self.table_name = 'chinabank'
         self.start_url = 'http://www.pbc.gov.cn/diaochatongjisi/116219/116225/11871/index{}.html'
         self.fields = ['pub_date', 'title', 'link', 'article']
+        self.table_name = 'chinabank'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def _create_table(self):
         self._spider_init()
@@ -126,18 +128,77 @@ class ChinaBankShuJuJieDu(GovBaseSpider, ChinaBankMixin):
             ret = self._batch_save(self.spider_client, ditems, self.table_name, self.fields)
             print("入库数量: ", ret)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -- - - - - -
+    @retry(stop_max_attempt_number=10)
+    def _parse_page(self, list_page):
+        doc = html.fromstring(list_page)
+        news_area = doc.xpath("//div[@opentype='page']")[0]
+        news_title_parts = news_area.xpath("//font[@class='newslist_style']")
+        items = []
+        for news_title_part in news_title_parts:
+            item = {}
+            try:
+                news_date_part = news_title_part.xpath("./following-sibling::span[@class='hui12']")[0].text_content()
+            except:
+                news_date_part = news_title_part.xpath("./following-sibling::a/span[@class='hui12']")[0].text_content()
+            item["PubDatetime"] = news_date_part
+            news_title = news_title_part.xpath("./a")[0].text_content()
+            item["Title"] = news_title
+            news_link = news_title_part.xpath("./a/@href")[0]
+            news_link = "http://www.pbc.gov.cn" + news_link
+            item["Website"] = news_link
+            items.append(item)
+        return items
+
+    def parse_page(self, list_page):
+        try:
+            items = self._parse_page(list_page)
+        except:
+            return []
+        else:
+            return items
+
+    def run(self):
+        self._spider_init()
+        for page in range(1, 3):
+            ditems = []
+            list_url = self.start_url.format(page)
+            list_page = self.fetch_page(list_url)
+            if list_page:
+                items = self.parse_page(list_page)
+                for item in items:
+                    detail_page = self.fetch_page(item['Website'])
+                    if detail_page:
+                        article = self.parse_detail_page(detail_page)
+                        if article:
+                            item['Content'] = article
+                            # 补充合并表字段
+                            item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                            item['MedName'] = self.name
+                            item['OrgMedName'] = self.name
+                            item['OrgTableCode'] = self.table_code
+                            print(item)
+                            ditems.append(item)
+
+            print("爬取数量: ", len(ditems))
+            self._spider_init()
+            ret = self._batch_save(self.spider_client, ditems, self.merge_table, self.merge_fields)
+            print("入库数量: ", ret)
+
 
 class ChinaBankXinWenFaBu(ChinaBankShuJuJieDu):
     def __init__(self):
         super(ChinaBankXinWenFaBu, self).__init__()
-        self.name = '中国银行-新闻发布'
-        self.table_name = "chinabank"
         self.start_url = "http://www.pbc.gov.cn/goutongjiaoliu/113456/113469/11040/index{}.html"
 
 
 if __name__ == "__main__":
     # ChinaBankShuJuJieDu().start()
+    ChinaBankShuJuJieDu().run()
 
-    ChinaBankXinWenFaBu().start()
+    print("* " * 100)
+
+    # ChinaBankXinWenFaBu().start()
+    ChinaBankXinWenFaBu().run()
 
     pass
