@@ -8,16 +8,18 @@ sys.path.insert(0, file_path)
 
 from CArticle.ca_spider import CArticleSpiser
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class CaSchedule(SpiderBase):
     table_name = "eastmoney_carticle"
-    # dt_benchmark = 'pub_date'
 
     def __init__(self):
         super(CaSchedule, self).__init__()
         self.keys = list(self.dc_info().values())
         random.shuffle(self.keys)
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def dc_info(self):
         self._dc_init()
@@ -57,6 +59,32 @@ class CaSchedule(SpiderBase):
             print("当前的主题是: {}".format(key))
             self.run(key)
 
+    def trans_history(self):
+        self._spider_init()
+        for i in range(1000):    # TODO
+            trans_sql = '''select pub_date as PubDatetime,\
+code as SecuCode, \
+title as Title,\
+link as Website,\
+article as Content, \
+CREATETIMEJZ as CreateTime, \
+UPDATETIMEJZ as UpdateTime \
+from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+            datas = self.spider_client.select_all(trans_sql)
+            print(len(datas))
+            if not datas:
+                break
+            for data in datas:
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
 
 if __name__ == "__main__":
-    CaSchedule().start()
+    # CaSchedule().start()
+
+    CaSchedule().trans_history()
+
+    pass
