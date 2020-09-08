@@ -121,8 +121,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
 
 
 if __name__ == "__main__":
-    NetEaseMoney().start()
+    # NetEaseMoney().start()
 
-    # NetEaseMoney().trans_history()
+    NetEaseMoney().trans_history()
 
     pass
