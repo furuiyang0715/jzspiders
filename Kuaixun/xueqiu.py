@@ -89,13 +89,14 @@ class XueQiuKuaiXun(SpiderBase):
 link as Website,\
 text as Content, \
 CREATETIMEJZ as CreateTime, \
-UPDATETIMEJZ as UpdateTime \
+UPDATETIMEJZ as UpdateTime, id \
 from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
             datas = self.spider_client.select_all(trans_sql)
             print(len(datas))
             if not datas:
                 break
             for data in datas:
+                data['Title'] = data['Content'][:20]
                 data['DupField'] = "{}_{}".format(self.table_code, data['id'])
                 data['MedName'] = self.name
                 data['OrgMedName'] = self.name
