@@ -231,8 +231,103 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
                 data['OrgTableCode'] = self.table_code
                 self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def _get_topic(self, url):
+        """获取栏目资讯"""
+        resp = requests.get(url, headers=self.headers)
+        if resp and resp.status_code == 200:
+            text = resp.text.encode("ISO-8859-1").decode("utf-8")
+            doc = html.fromstring(text)
+            articles = doc.xpath(".//div[@class='list']/ul[@id='lyp_article']/li")
+            items = []
+            for article in articles:
+                link = article.xpath("./a/@href")[0]   # 文章链接
+                title = article.xpath(".//p")[0].text_content()    # 文章标题
+
+                if len(title) > 64:
+                    title = title[:64]
+
+                ret = self.get_detail(link)
+
+                if not ret:
+                    continue
+
+                elif isinstance(ret, str):
+                    item = {
+                        'link': link,
+                        'title': title,
+                        'article': ret,
+                    }
+
+                else:   # isinstance(ret, tuple):
+                    item = {
+                        'link': link,
+                        'title': title,
+                        'author': ret[0],
+                        'pub_date': ret[1],
+                        'article': ret[2],
+                    }
+                print(item)
+                items.append(item)
+            return items
+        return None
+
+    def _parse_api(self, api_url):
+        print(api_url)
+        resp = requests.get(api_url, headers=self.headers)
+        if resp and resp.status_code == 200:
+            body = resp.text
+            body = body.encode("ISO-8859-1").decode("utf-8")
+            data_str = re.findall('jsonp\d{13}\((.*)\)', body)[0]
+            try:
+                datas = json.loads(data_str)
+            except:
+                return
+
+            articles = datas.get("article")
+            items = []
+            for one in articles:
+                item = {}
+                pub_ts = int(one.get("published"))
+                pub_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(pub_ts))
+                item['pub_date'] = pub_date
+                title = one.get("title")
+                if len(title) > 64:
+                    title = title[:64]
+                item['title'] = title
+                item['author'] = one.get("author")
+                link = one.get("url")
+                item['link'] = link
+                article = self.get_detail(link, is_api=True)
+                item['article'] = article
+                print(item)
+                items.append(item)
+            return items
+
+    def run(self):
+        self._spider_init()
+
+        # 网页解析部分
+        for url in self.topic_urls:
+            topic_index_items = self._get_topic(url)
+            if topic_index_items and isinstance(topic_index_items, list):
+                ret = self._batch_save(self.spider_client, topic_index_items, self.merge_table, self.merge_fields)
+                print(ret)
+
+        # api 部分
+        for topic in self.topic_words:
+            cat_info = self.topic_code_map.get(topic)
+            api_url = self.api_format_url % (cat_info.get("catid"), cat_info.get('allcid'))
+            api_topic_items = self._parse_api(api_url)
+            if api_topic_items and isinstance(api_topic_items, list):
+                ret = self._batch_save(self.spider_client, api_topic_items, self.merge_table, self.merge_fields)
+
 
 if __name__ == '__main__':
     # EEOSpider().start()
 
-    EEOSpider().trans_history()
+    # EEOSpider().trans_history()
+
+    EEOSpider().run()
+
+    pass
