@@ -30,7 +30,7 @@ class PingLun9666(SpiderBase):
         self.fields = ['pub_date', 'title', 'article', 'link']
         self.table_name = '9666pinglun'
         info = utils.org_tablecode_map.get(self.table_name)
-        self.name, self.table_code = info[0], info[1]
+        self.name, self.table_code = info[0], info[1]   # 1046
 
     def _create_table(self):
         sql = '''

@@ -65,7 +65,7 @@ class EEOSpider(SpiderBase):
         self.table_name = 'EEONews'
         # self.name = '经济观察网新闻'
         info = utils.org_tablecode_map.get(self.table_name)
-        self.name, self.table_code = info[0], info[1]
+        self.name, self.table_code = info[0], info[1]   # 1045
         self.fields = ['pub_date', 'title', 'link', 'article', 'author']
 
     def get_topic(self, url):

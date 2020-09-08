@@ -24,7 +24,7 @@ class JFSchedule(SpiderBase):
     # name = '巨丰财经'
 
     info = utils.org_tablecode_map.get(table_name)
-    name, table_code = info[0], info[1]
+    name, table_code = info[0], info[1]    # 1033
 
     def ins_start(self, instance):
         instance.start()
