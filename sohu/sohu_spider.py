@@ -144,6 +144,43 @@ secureScore=50\
         self.save_queue.join()
         print(f"入库数量: {self.save_num}")
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def _save_items(self):
+        while True:
+            item = self.save_queue.get()
+            data = dict()
+            data['PubDatetime'] = item.get("pub_date")
+            data['Title'] = item.get("title")
+            data['Website'] = item.get("link")
+            data['Content'] = item.get("article")
+            data['CreateTime'] = item.get("CREATETIMEJZ")
+            data['UpdateTime'] = item.get("UPDATETIMEJZ")
+            # 增加合并表的字段
+            data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+            data['MedName'] = self.name
+            data['OrgMedName'] = self.name
+            data['OrgTableCode'] = self.table_code
+
+            ret = self._save(self.spider_client, data, self.merge_table, self.merge_fields)
+            if ret:
+                self.save_num += 1
+            self.save_queue.task_done()
+
+    def run(self):
+        self._spider_init()
+        for page in range(1, 4):
+            list_url = self.format_url % page
+            self.get_list_items(list_url)
+            th = threading.Thread(target=self.get_list_items, args=(list_url,))
+            th.start()
+        self.run_use_more_task(self.get_detail_page, 3)
+        self.run_use_more_task(self.parse_detail_page, 3)
+        self.run_use_more_task(self._save_items, 1)
+        self.list_item_queue.join()
+        self.detail_page_queue.join()
+        self.save_queue.join()
+        print(f"入库数量: {self.save_num}")
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):    # TODO
@@ -169,6 +206,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 if __name__ == "__main__":
     # SuhuFinance().start()
 
-    SuhuFinance().trans_history()
+    # SuhuFinance().trans_history()
+
+    SuhuFinance().run()
 
     pass
