@@ -98,6 +98,36 @@ class NetEaseMoney(SpiderBase):
             print(len(items))
             print(ret)
 
+    #  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def run(self):
+        self._spider_init()
+        list_resp = self.get_list_resp()
+        print("List Resp: {}".format(list_resp))
+        if list_resp and list_resp.status_code == 200:
+            body = list_resp.text
+            ret = list(self._parse_list(body))
+            for one in ret:
+                item = dict()
+                link = one.get("l")
+                item['Website'] = link
+                item['Title'] = one.get("t")
+                pub_date = one.get("p")
+                item['PubDatetime'] = pub_date
+                article = self._parse_detail(one.get("l"))
+
+                if article:
+                    item['Content'] = article
+                    # 增加汇总表字段
+                    item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                    item['MedName'] = self.name
+                    item['OrgMedName'] = self.name
+                    item['OrgTableCode'] = self.table_code
+
+                    print(item)
+                    self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+        else:
+            raise Exception("请求无响应")
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):  # TODO
@@ -123,6 +153,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
 if __name__ == "__main__":
     # NetEaseMoney().start()
 
-    NetEaseMoney().trans_history()
+    # NetEaseMoney().trans_history()
+
+    NetEaseMoney().run()
 
     pass
