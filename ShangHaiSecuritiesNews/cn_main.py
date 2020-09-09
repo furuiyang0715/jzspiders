@@ -35,6 +35,14 @@ class CNSchedule(SpiderBase):
             print(ins.name)
             ins.start()
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def run(self):
+        for cls in self.class_lst:
+            ins = cls()
+            print(ins.name)
+            ins.run()
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):    # TODO
@@ -60,6 +68,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 if __name__ == "__main__":
     # CNSchedule().start()
 
-    CNSchedule().trans_history()
+    # CNSchedule().trans_history()
+
+    CNSchedule().run()
 
     pass

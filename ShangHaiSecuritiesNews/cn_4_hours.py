@@ -9,6 +9,7 @@ from gne import GeneralNewsExtractor
 from lxml import html
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class CN4Hours(SpiderBase):
@@ -18,8 +19,10 @@ class CN4Hours(SpiderBase):
         self.list_url = "http://app.cnstock.com/api/theme/get_theme_list?"
         self.extractor = GeneralNewsExtractor()
         self.table_name = "cn_stock"
-        self.name = '上证四小时'
         self.fields = ['pub_date', 'title', 'link', 'article']
+        self.type = '上证四小时'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def _create_table(self):
         self._spider_init()
@@ -131,7 +134,54 @@ class CN4Hours(SpiderBase):
         ret = self._batch_save(self.spider_client, nitems, self.table_name, self.fields)
         print("插入个数: ", ret)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def _get_list(self):
+        count = self.get_count()
+        print("网页个数: ", count)
+        items = []
+        for latest_id in range(count, 0, -5):
+            params = self.make_query_params(latest_id)
+            url = self.list_url + urlencode(params)
+            ret = req.get(url, headers=self.headers).text
+            print(ret)
+            try:
+                json_data = re.findall(r'jQuery\d{20}_\d{13}\((\{.*?\})\)', ret)[0]
+            except:
+                continue
+
+            py_data = json.loads(json_data)
+            datas = py_data.get("item")
+            if not datas:
+                break
+            for one in datas:
+                item = dict()
+                item['PubDatetime'] = one.get("datetime")
+                item['Title'] = one.get("title")
+                item['zhaiyao'] = 'http://news.cnstock.com/theme,{}.html'.format(one.get("id"))
+                items.append(item)
+        return items
+
+    def run(self):
+        self._spider_init()
+        items = self._get_list()
+        for item in items:
+            zhaiyao_link = item.get('zhaiyao')
+            detail_url = self.get_zhaiyao(zhaiyao_link)
+            if detail_url:
+                item['Website'] = detail_url
+                item['Content'] = self.get_detail(detail_url)
+                item.pop("zhaiyao")
+                # 增加合并表的字段
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
 
 if __name__ == "__main__":
-    cn4 = CN4Hours()
-    cn4.start()
+    # CN4Hours().start()
+
+    CN4Hours().run()
+
+    pass
