@@ -9,6 +9,7 @@ import requests as req
 from gne import GeneralNewsExtractor
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class CNStock(SpiderBase):
@@ -21,7 +22,6 @@ class CNStock(SpiderBase):
         self.headers = headers
         self.list_url = "http://app.cnstock.com/api/waterfall?"
         self.extractor = GeneralNewsExtractor()
-        self.table_name = "cn_stock"
         self.topic_list = [
             'qmt-sns_yw',     # 要闻-宏观
             'qmt-sns_jg',     # 要闻-金融
@@ -45,7 +45,10 @@ class CNStock(SpiderBase):
             "qmt-sjrz_yw",   # 新三板-要闻
         ]
         self.fields = ['pub_date', 'title', 'link', 'article']
-        self.name = '宏观等'
+        self.type = '宏观等'
+        self.table_name = "cn_stock"
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
 
     def make_query_params(self, topic, page):
         """
@@ -130,10 +133,48 @@ class CNStock(SpiderBase):
             ret = self._batch_save(self.spider_client, topic_items, self.table_name, self.fields)
             print(f"入库数: {ret}")
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def _get_list(self, topic, page):
+        params = self.make_query_params(topic, page)
+        url = self.list_url + urlencode(params)
+        ret = req.get(url, headers=self.headers).text
+        json_data = re.findall(r'jQuery\d{20}_\d{13}\((\{.*?\})\)', ret)[0]
+        py_data = json.loads(json_data)
+        datas = py_data.get("data", {}).get("item")
+        if not datas:
+            return []
+        for one in datas:
+            item = dict()
+            pub_date = datetime.datetime.strptime(one.get("time"), "%Y-%m-%d %H:%M:%S")
+            item['PubDatetime'] = pub_date
+            item['Title'] = one.get("title")
+            link = one.get("link")
+            item['Website'] = link
+            article = self.get_detail(link)
+            if article:
+                item['Content'] = article
+                # 增加合并表的字段
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
+    def run(self):
+        self._spider_init()
+        for topic in self.topic_list:
+            print(topic)
+            for page in range(1, 10):
+                self._get_list(topic, page)
+
 
 if __name__ == "__main__":
-    cns = CNStock()
     # 测试解析详情页可以实现自动翻页
     # ret = cns.get_detail("http://ggjd.cnstock.com/company/scp_ggjd/tjd_ggjj/202002/4489878.htm")
     # print(ret)
-    cns.start()
+
+    # CNStock().start()
+
+    CNStock().run()
+
+    pass
