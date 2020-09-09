@@ -91,6 +91,43 @@ class SecuritiesDaily(SpiderBase):
                     items.append(item)
                 self._batch_save(self.spider_client, items, self.table_name, self.fields)
 
+    #  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def run(self):
+        self._spider_init()
+        for i in range(1, 2):
+            list_url = self.list_url_base.format(i)
+            resp = requests.get(list_url)
+            if resp and resp.status_code == 200:
+                body = resp.text.encode("ISO-8859-1").decode("utf-8")
+                doc = html.fromstring(body)
+                lst = doc.xpath(".//div[@class='news_content']/ul/li")
+                for li in lst:
+                    item = dict()
+                    title = li.xpath("./a/@title")[0]
+                    try:
+                        _type, _title = str(title).split("：", maxsplit=1)
+                    except:
+                        print("Split Error: {}".format(title))
+                        if title:
+                            _type = '快讯'
+                            _title = title
+                        else:
+                            raise
+                    link = li.xpath("./a/@href")[0]
+                    pub_date = li.xpath("./span[@class='date']")[0].text_content()
+                    item['InnerType'] = _type
+                    item['Title'] = _title
+                    item['Website'] = link
+                    item['PubDatetime'] = pub_date
+                    item['Content'] = self.parse_detail(link)
+                    # 增加汇总表字段
+                    item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                    item['MedName'] = self.name
+                    item['OrgMedName'] = self.name
+                    item['OrgTableCode'] = self.table_code
+                    print(item)
+                    self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):    # TODO
@@ -124,6 +161,8 @@ if __name__ == '__main__':
 
     # SecuritiesDaily().start()
 
-    SecuritiesDaily().trans_history()
+    # SecuritiesDaily().trans_history()
+
+    SecuritiesDaily().run()
 
     pass
