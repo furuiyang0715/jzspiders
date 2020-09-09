@@ -167,6 +167,49 @@ class P2PEye(SpiderBase):
         self.save_queue.join()
         print("耗时: {}".format(time.time() - t1))
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def _save_items(self):
+        while True:
+            item = self.save_queue.get()
+            mitem = {
+                "PubDatetime": item.get("pub_date"),
+                "Title": item.get("title"),
+                "Website": item.get("link"),
+                "Content": item.get("article"),
+                "CreateTime": item.get("CREATETIMEJZ"),
+                "UpdateTime": item.get("UPDATETIMEJZ"),
+                'DupField': "{}_{}".format(self.table_code, item.get("link")),
+                'MedName': self.name,
+                'OrgMedName': self.name,
+                'OrgTableCode': self.table_code,
+            }
+            try:
+                self._save(self.spider_client, mitem, self.merge_table, self.merge_fields)
+            except Exception as e:
+                print("Parse detail error: {}".format(e))
+            self.save_queue.task_done()
+
+    def run(self):
+        t1 = time.time()
+        self._spider_init()
+
+        self.get_topic_list()
+
+        index_spider = threading.Thread(target=self.get_list)
+        index_spider.start()
+
+        for i in range(4):
+            datas_parser = threading.Thread(target=self.get_detail)
+            datas_parser.start()
+
+        datas_saver = threading.Thread(target=self._save_items)
+        datas_saver.start()
+
+        self.list_queue.join()
+        self.save_queue.join()
+        print("耗时: {}".format(time.time() - t1))
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):    # TODO
@@ -192,6 +235,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 if __name__ == "__main__":
     # P2PEye().start()
 
-    P2PEye().trans_history()
+    # P2PEye().trans_history()
+
+    P2PEye().run()
 
     pass
