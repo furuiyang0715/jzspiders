@@ -14,6 +14,7 @@ sys.path.insert(0, file_path)
 
 from base_spider import SpiderBase, logger
 from configs import LOCAL, LOCAL_PROXY_URL, PROXY_URL
+from scripts import utils
 
 
 class TakungpaoBase(SpiderBase):
@@ -23,6 +24,8 @@ class TakungpaoBase(SpiderBase):
         self.extractor = GeneralNewsExtractor()
         self.fields = ['pub_date', 'link', 'title', 'article', 'source']
         self.table_name = 'Takungpao'
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
         self.by_the_time = datetime.datetime.today() - datetime.timedelta(days=2)
 
     def _get_proxy(self):

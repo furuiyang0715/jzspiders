@@ -60,3 +60,43 @@ class EconomicObserver(TakungpaoBase):
             items = self._parse_list(list_url)
             page_save_num = self._batch_save(self.spider_client, items, self.table_name, self.fields)
             print("第{}页保存的个数是{}".format(page, page_save_num))
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def parse_list(self, list_url):
+        list_resp = self.get(list_url)
+        if list_resp and list_resp.status_code == 200:
+            list_page = list_resp.text
+            doc = html.fromstring(list_page)
+            news_list = doc.xpath('//div[@class="sublist_mobile"]/dl[@class="item"]')
+            for news in news_list:
+                item = dict()
+                link = news.xpath('./dd[@class="intro"]/a/@href')[0]
+                item['Website'] = link
+
+                title = news.xpath("./dd/a/@title")[0]
+                title = self._process_content(title)
+                item['Title'] = title
+
+                pub_date = news.xpath("./dd[@class='date']/text()")[0]
+                pub_date = self._process_pub_dt(pub_date)
+                item['PubDatetime'] = pub_date
+
+                article = self._parse_detail(link)
+                if article:
+                    article = self._process_content(article)
+                    item['Content'] = article
+
+                    item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                    item['MedName'] = self.name
+                    if not item['OrgMedName']:
+                        item['OrgMedName'] = self.name
+                    item['OrgTableCode'] = self.table_code
+
+    def run(self):
+        self._spider_init()
+        for page in range(1, self.page + 1):
+            if page == 1:
+                list_url = self.first_url
+            else:
+                list_url = self.format_url.format(page)
+            self.parse_list(list_url)
