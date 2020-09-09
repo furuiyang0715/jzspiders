@@ -220,20 +220,14 @@ class Reference(SpiderBase):
         index_resp = self.get(self.index_url)
         if index_resp and index_resp.status_code == 200:
             index_page = index_resp.text
-            index_items = self.parse_index(index_page)
-            # page_save_num = self._batch_save(self.spider_client, index_items, self.merge_table,
-            #                                  self.merge_fields)
-            # print(f"首页入库的个数是 {page_save_num}")
+            self.parse_index(index_page)
 
         for num in range(1, self.max_page + 1):
             more_url = self.more_url.format(num)
             more_resp = self.get(more_url)
             if more_resp and more_resp.status_code == 200:
                 more_page = more_resp.text
-                items = self.parse_more(more_page)
-                # page_save_num = self._batch_save(self.spider_client, items, self.merge_table,
-                #                                  self.merge_fields)
-                # print(f"当前页 {num} 入库的个数是 {page_save_num}")
+                self.parse_more(more_page)
 
 
 class HKInfo(Reference):
