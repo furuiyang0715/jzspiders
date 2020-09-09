@@ -61,7 +61,7 @@ class CaSchedule(SpiderBase):
 
     def trans_history(self):
         self._spider_init()
-        for i in range(1000):    # TODO
+        for i in range(1000):    # TODO  第一次更新到 5982071 =
             trans_sql = '''select pub_date as PubDatetime,\
 code as SecuCode, \
 title as Title,\
