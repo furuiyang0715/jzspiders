@@ -134,6 +134,29 @@ class qqStock(SpiderBase):
         #                     item['article'] = article
         #                     print(">>>>>", item)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def run(self):
+        self._spider_init()
+
+        specials, articles = self._parse_list()
+        for article in articles:
+            item = {}
+            vurl = article.get("vurl")
+            item['Website'] = vurl
+            item['PubDatetime'] = article.get("publish_time")
+            item['Title'] = article.get("title")
+            article = self._parse_article(vurl)
+            if article:
+                item['Content'] = article
+                # 增加合并表字段
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
+                print(item)
+                self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):    # TODO
@@ -159,7 +182,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 if __name__ == "__main__":
     # qqStock().start()
 
-    qqStock().trans_history()
+    # qqStock().trans_history()
 
+    qqStock().run()
 
     pass
