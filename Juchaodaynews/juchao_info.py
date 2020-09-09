@@ -153,6 +153,41 @@ class JuChaoInfo(SpiderBase):
         for items in (zuixin_items, stock_items, fund_items, datas_items):
             save_num = self._batch_save(self.spider_client, items, self.table_name, self.fields)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def _process_records(self, records, type_code):
+        for record in records:
+            item = dict()
+            pub_date = record.get("DECLAREDATE")
+            if not pub_date:
+                pub_date = record.get("RECTIME")
+            item['PubDatetime'] = pub_date  # 发布时间
+            item['SecuCode'] = record.get("SECCODE")  # 证券代码
+            item['Title'] = record.get("F001V")  # 资讯标题
+            item['InnerType'] = record.get("F003V")   # 资讯类别
+            item['Content'] = record.get("F002V")   # 资讯摘要
+            # 增加合并表字段
+            item['DupField'] = "{}_{}_{}".format(self.table_code, item['SecuCode'], item['Title'])
+            item['MedName'] = self.name
+            item['OrgMedName'] = self.name
+            item['OrgTableCode'] = self.table_code
+            self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
+    def run(self):
+        self._spider_init()
+
+        zuixin_records = self.get_list(self.zuixin_url)
+        self._process_records(zuixin_records, 1128)
+
+        stock_records = self.get_list(self.stock_url)
+        self._process_records(stock_records, 1078)
+
+        fund_records = self.get_list(self.fund_url)
+        self._process_records(fund_records, 1126)
+
+        datas_records = self.get_list(self.datas_url)
+        self._process_records(datas_records, 1127)
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):    # TODO
@@ -179,7 +214,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 if __name__ == "__main__":
     # JuChaoInfo().start()
 
-    JuChaoInfo().trans_history()
+    # JuChaoInfo().trans_history()
 
+    JuChaoInfo().run()
 
     pass
