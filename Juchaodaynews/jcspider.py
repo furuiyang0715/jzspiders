@@ -101,6 +101,47 @@ class JuchaoDayNews(SpiderBase):
             _day += datetime.timedelta(days=1)
             time.sleep(2)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def run(self):
+        self._spider_init()
+        end_day = datetime.datetime.combine(datetime.datetime.now(), datetime.time.min)
+        start_day = end_day - datetime.timedelta(days=1)
+
+        _day = start_day
+        while _day <= end_day:
+            _day_str = _day.strftime("%Y-%m-%d")
+            resp = requests.get(self.api_url.format(_day_str), headers=self.headers)
+            if resp and resp.status_code == 200:
+                text = resp.text
+                datas = json.loads(text)
+                if not datas:
+                    print("{} 无公告数据".format(_day_str))
+                else:
+                    # 保存数据
+                    items = []
+                    for data in datas:
+                        item = {}
+                        # 需要保存的字段: 快讯的发布详细时间、类型、标题、地址、股票代码、股票名称
+                        announcementTime = time.localtime(int(data.get("announcementTime") / 1000))
+                        announcementTime = time.strftime("%Y-%m-%d %H:%M:%S", announcementTime)
+                        item['PubDatetime'] = announcementTime
+                        item['InnerType'] = data.get("type")
+                        item['Title'] = data.get("title")
+                        item['Website'] = data.get("pagePath")
+                        code = data.get("code")
+                        if code:
+                            item['SecuCode'] = code
+                            item['SecuAbbr'] = self.get_secu_abbr(code)
+                        # 增加合并表的字段
+                        item['DupField'] = "{}_{}".format(self.table_code, item['Title'])
+                        item['MedName'] = self.name
+                        item['OrgMedName'] = self.name
+                        item['OrgTableCode'] = self.table_code
+                        self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+                        print(item)
+            _day += datetime.timedelta(days=1)
+            time.sleep(2)
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):    # TODO
@@ -129,6 +170,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 if __name__ == '__main__':
     # JuchaoDayNews().start()
 
-    JuchaoDayNews().trans_history()
+    # JuchaoDayNews().trans_history()
+
+    JuchaoDayNews().run()
 
     # jc.get_secu_abbr("601827")
