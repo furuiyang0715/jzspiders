@@ -61,25 +61,33 @@ class CaSchedule(SpiderBase):
 
     def trans_history(self):
         self._spider_init()
-        for i in range(1000):    # TODO  第一次更新到 5982071 =
-            trans_sql = '''select pub_date as PubDatetime,\
+        for i in range(1000):    # TODO  第一次更新到 5982071
+            ids = []
+            trans_sql = '''select id,  \
+pub_date as PubDatetime,\
 code as SecuCode, \
 title as Title,\
 link as Website,\
 article as Content, \
 CREATETIMEJZ as CreateTime, \
 UPDATETIMEJZ as UpdateTime \
-from {} limit {}, 1000; '''.format(self.table_name, i*1000)
+from {} where IsMeg = 0 limit {}, 1000; '''.format(self.table_name, i*1000)
             datas = self.spider_client.select_all(trans_sql)
             print(len(datas))
             if not datas:
                 break
             for data in datas:
+                ids.append(data.pop("id"))
                 data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
                 data['MedName'] = self.name
                 data['OrgMedName'] = self.name
                 data['OrgTableCode'] = self.table_code
                 self._save(self.spider_client, data, 'OriginSpiderAll', self.merge_fields)
+
+            print(ids)
+            sql = '''update {} set IsMeg = 1 where id in {}; '''.format(self.table_name, tuple(ids))
+            self.spider_client.insert(sql)
+            self.spider_client.end()
 
 
 if __name__ == "__main__":
