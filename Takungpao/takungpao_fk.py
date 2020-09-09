@@ -6,7 +6,7 @@ class FK(TakungpaoBase):
     def __init__(self):
         super(FK, self).__init__()
         self.list_url = 'http://finance.takungpao.com/fk/'
-        self.name = '风口'
+        self.type = '风口'
 
     def _parse_detail(self, body):
         result = self.extractor.extract(body)

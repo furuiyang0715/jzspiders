@@ -5,7 +5,7 @@ from Takungpao.base import TakungpaoBase
 class EconomicObserver(TakungpaoBase):
     def __init__(self):
         super(EconomicObserver, self).__init__()
-        self.name = '经济观察家'
+        self.type = '经济观察家'
         self.first_url = 'http://www.takungpao.com/finance/236134/index.html'
         self.format_url = 'http://www.takungpao.com/finance/236134/{}.html'
         self.page = 2

@@ -5,7 +5,7 @@ from Takungpao.base import TakungpaoBase
 class ZhongGuoJingJi(TakungpaoBase):
     def __init__(self):
         super(ZhongGuoJingJi, self).__init__()
-        self.name = '中国经济'
+        self.type = '中国经济'
         self.first_url = 'http://www.takungpao.com/finance/236132/index.html'
         self.format_url = 'http://www.takungpao.com/finance/236132/{}.html'
 
@@ -118,7 +118,7 @@ class NewFinanceTrend(ZhongGuoJingJi):
     """废弃"""
     def __init__(self):
         super(NewFinanceTrend, self).__init__()
-        self.name = '新经济浪潮'
+        self.type = '新经济浪潮'
         self.first_url = 'http://www.takungpao.com/finance/236160/index.html'
         self.format_url = 'http://www.takungpao.com/finance/236160/{}.html'
 
@@ -126,7 +126,7 @@ class NewFinanceTrend(ZhongGuoJingJi):
 class HKCaiJing(ZhongGuoJingJi):
     def __init__(self):
         super(HKCaiJing, self).__init__()
-        self.name = '香港财经'
+        self.type = '香港财经'
         self.first_url = 'http://www.takungpao.com/finance/236131/index.html'
         self.format_url = 'http://www.takungpao.com/finance/236131/{}.html'
 
@@ -134,7 +134,7 @@ class HKCaiJing(ZhongGuoJingJi):
 class HKStock(ZhongGuoJingJi):
     def __init__(self):
         super(HKStock, self).__init__()
-        self.name = "港股"
+        self.type = "港股"
         self.first_url = 'http://www.takungpao.com/finance/236135/index.html'
         self.format_url = 'http://www.takungpao.com/finance/236135/{}.html'
 
@@ -142,7 +142,7 @@ class HKStock(ZhongGuoJingJi):
 class GuoJiJingJi(ZhongGuoJingJi):
     def __init__(self):
         super(GuoJiJingJi, self).__init__()
-        self.name = "国际经济"
+        self.type = "国际经济"
         self.first_url = 'http://www.takungpao.com/finance/236133/index.html'
         self.format_url = 'http://www.takungpao.com/finance/236133/{}.html'
 
@@ -150,7 +150,7 @@ class GuoJiJingJi(ZhongGuoJingJi):
 class DiChan(ZhongGuoJingJi):
     def __init__(self):
         super(DiChan, self).__init__()
-        self.name = '地产'
+        self.type = '地产'
         self.first_url = 'http://www.takungpao.com/finance/236136/index.html'
         self.format_url = 'http://www.takungpao.com/finance/236136/{}.html'
 
@@ -158,6 +158,6 @@ class DiChan(ZhongGuoJingJi):
 class Business(ZhongGuoJingJi):
     def __init__(self):
         super(Business, self).__init__()
-        self.name = '商业'
+        self.type = '商业'
         self.first_url = 'http://www.takungpao.com/finance/236137/index.html'
         self.format_url = 'http://www.takungpao.com/finance/236137/{}.html'

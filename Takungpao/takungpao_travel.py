@@ -7,7 +7,7 @@ class Travel(TakungpaoBase):
         super(Travel, self).__init__()
         self.first_url = 'http://finance.takungpao.com/travel/index.html'
         self.format_url = 'http://finance.takungpao.com/travel/index_{}.html'
-        self.name = '旅游'
+        self.type = '旅游'
         self.page = 2
 
     def _parse_page(self, body):

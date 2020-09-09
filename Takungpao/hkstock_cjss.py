@@ -6,7 +6,7 @@ class HKStock_CJSS(TakungpaoBase):
     def __init__(self):
         super(HKStock_CJSS, self).__init__()
         self.page = 2
-        self.name = '财经时事'
+        self.type = '财经时事'
         self.first_url = 'http://finance.takungpao.com/hkstock/cjss/index.html'
         self.format_url = "http://finance.takungpao.com/hkstock/cjss/index_{}.html"
 
@@ -70,7 +70,7 @@ class HKStock_CJSS(TakungpaoBase):
 class HKStock_QQGS(HKStock_CJSS):
     def __init__(self):
         super(HKStock_QQGS, self).__init__()
-        self.name = '全球股市'
+        self.type = '全球股市'
         self.first_url = 'http://finance.takungpao.com/hkstock/qqgs/index.html'
         self.format_url = "http://finance.takungpao.com/hkstock/qqgs/index_{}.html"
 
@@ -78,7 +78,7 @@ class HKStock_QQGS(HKStock_CJSS):
 class HKStock_JJYZ(HKStock_CJSS):
     def __init__(self):
         super(HKStock_JJYZ, self).__init__()
-        self.name = '经济一周'
+        self.type = '经济一周'
         self.first_url = 'http://finance.takungpao.com/hkstock/jjyz/index.html'
         self.format_url = "http://finance.takungpao.com/hkstock/jjyz/index_{}.html"
 
@@ -86,7 +86,7 @@ class HKStock_JJYZ(HKStock_CJSS):
 class HKStock_JGSD(HKStock_CJSS):
     def __init__(self):
         super(HKStock_JGSD, self).__init__()
-        self.name = '机构视点'
+        self.type = '机构视点'
         self.first_url = 'http://finance.takungpao.com/hkstock/jgsd/index.html'
         self.format_url = "http://finance.takungpao.com/hkstock/jgsd/index_{}.html"
 
@@ -94,7 +94,7 @@ class HKStock_JGSD(HKStock_CJSS):
 class HKStock_GSYW(HKStock_CJSS):
     def __init__(self):
         super(HKStock_GSYW, self).__init__()
-        self.name = '公司要闻'
+        self.type = '公司要闻'
         self.first_url = 'http://finance.takungpao.com/hkstock/gsyw/index.html'
         self.format_url = "http://finance.takungpao.com/hkstock/gsyw/index_{}.html"
 
@@ -102,6 +102,6 @@ class HKStock_GSYW(HKStock_CJSS):
 class HKStock_GJJJ(HKStock_CJSS):
     def __init__(self):
         super(HKStock_GJJJ, self).__init__()
-        self.name = '国际聚焦'
+        self.type = '国际聚焦'
         self.first_url = 'http://finance.takungpao.com/hkstock/gjjj/index.html'
         self.format_url = "http://finance.takungpao.com/hkstock/gjjj/index_{}.html"
