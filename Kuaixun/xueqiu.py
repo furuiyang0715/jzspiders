@@ -82,6 +82,42 @@ class XueQiuKuaiXun(SpiderBase):
             next_url = self.fetch_datas(next_url)
             time.sleep(1)
 
+    #  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def _fetch_datas(self, url):
+        resp = requests.get(url, headers=self.headers)
+        if resp and resp.status_code == 200:
+            text = resp.text
+            datas = json.loads(text)
+            next_max_id = datas.get("next_max_id")
+            next_url = self.base_api.format(next_max_id)
+            items = datas.get("items")
+            for item in items:
+                _pub_date = datetime.datetime.fromtimestamp(int(item.get("created_at") / 1000))
+
+                to_insert = {
+                    "PubDatetime": _pub_date,
+                    "Content": item.get("text"),
+                    "Website": item.get("link"),
+                    'Title': item.get("text")[:20],
+                    'DupField': "{}_{}".format(self.table_code, item.get("id")),
+                    'MedName': self.name,
+                    'OrgMedName': self.name,
+                    'OrgTableCode': self.table_code,
+                }
+
+                self._save(self.spider_client, to_insert, self.merge_table, self.merge_fields)
+                if _pub_date < datetime.datetime.now() - datetime.timedelta(minutes=60):
+                    return None
+            return next_url
+
+    def run(self):
+        self._spider_init()
+        next_url = self._fetch_datas(self.first_api)
+        while next_url:
+            print(next_url)
+            next_url = self._fetch_datas(next_url)
+            time.sleep(1)
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):  # TODO
@@ -107,6 +143,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
 if __name__ == '__main__':
     # XueQiuKuaiXun().start()
 
-    XueQiuKuaiXun().trans_history()
+    # XueQiuKuaiXun().trans_history()
+
+    XueQiuKuaiXun().run()
 
     pass
