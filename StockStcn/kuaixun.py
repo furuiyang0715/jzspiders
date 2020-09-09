@@ -29,7 +29,7 @@ class STCNEgs(STCNBase):
         self.base_url = 'https://kuaixun.stcn.com/egs/'
         self.first_url = 'https://kuaixun.stcn.com/egs/index.html'
         self.format_url = 'https://kuaixun.stcn.com/egs/index_{}.html'
-        self.name = 'e公司'
+        self.type = 'e公司'
         self.list_parse_func = self.parse_list_items
 
     @staticmethod
@@ -447,7 +447,7 @@ from {} limit {}, 1000; '''.format(self.table_name, i*1000)
 if __name__ == "__main__":
     # STCNSchedule().start()
 
-    STCNSchedule().trans_history()
+    # STCNSchedule().trans_history()
 
     STCNSchedule().run()
 

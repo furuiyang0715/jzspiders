@@ -4,12 +4,15 @@ from lxml import html
 from retrying import retry
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class STCNBase(SpiderBase):
     def __init__(self):
         super(STCNBase, self).__init__()
         self.table_name = "stcn_info"
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
         self.extractor = GeneralNewsExtractor()
         self.fields = ['pub_date', 'code', 'title', 'link', 'article']
 
@@ -122,3 +125,33 @@ class STCNBase(SpiderBase):
                 self._spider_init()
                 ret = self._batch_save(self.spider_client, items, self.table_name, self.fields)
                 print("入库数量: {}".format(ret))
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def run(self):
+        self._spider_init()
+
+        for page in range(3):
+            if page == 0:
+                list_url = self.first_url
+            else:
+                list_url = self.format_url.format(page)
+
+            print(list_url)
+            list_page = self.get(list_url)
+            if list_page:
+                items = self.parse_list_body(list_page)
+                for item in items:
+                    data = dict()
+                    data['PubDatetime'] = item.get("pub_date")
+                    data['SecuCode'] = item.get("code")
+                    data['Title'] = item.get("title")
+                    data['Website'] = item.get("link")
+                    data['Content'] = item.get("article")
+                    data['CreateTime'] = item.get("CREATETIMEJZ")
+                    data['UpdateTime'] = item.get("UPDATETIMEJZ")
+
+                    data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                    data['MedName'] = self.name
+                    data['OrgMedName'] = self.name
+                    data['OrgTableCode'] = self.table_code
+                    self._save(self.spider_client, data, self.merge_table, self.merge_fields)
