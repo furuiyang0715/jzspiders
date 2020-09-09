@@ -19,7 +19,7 @@ class STCNKuaixun(STCNBase):
         self.base_url = 'http://kuaixun.stcn.com/'
         self.first_url = 'http://kuaixun.stcn.com/index.html'
         self.format_url = "http://kuaixun.stcn.com/index_{}.html"
-        self.name = '快讯'
+        self.type = '快讯'
         self.list_parse_func = utils.parse_list_items_2
 
 
@@ -56,7 +56,7 @@ class STCNYanBao(STCNBase):
         self.base_url = 'https://kuaixun.stcn.com/yb/'
         self.first_url = 'https://kuaixun.stcn.com/yb/index.html'
         self.format_url = "https://kuaixun.stcn.com/yb/index_{}.html"
-        self.name = '研报'
+        self.type = '研报'
         self.list_parse_func = utils.parse_list_items_3
 
 
@@ -66,7 +66,7 @@ class STCNSS(STCNBase):
         self.base_url = 'https://kuaixun.stcn.com/ss/'
         self.first_url = 'https://kuaixun.stcn.com/ss/index.html'
         self.format_url = 'https://kuaixun.stcn.com/ss/index_{}.html'
-        self.name = '时事'
+        self.type = '时事'
         self.list_parse_func = self.parse_list_items
 
     @staticmethod
@@ -103,7 +103,7 @@ class CJCNSS(STCNBase):
         self.base_url = 'https://kuaixun.stcn.com/cj/'
         self.first_url = 'https://kuaixun.stcn.com/cj/index.html'
         self.format_url = 'https://kuaixun.stcn.com/cj/index_{}.html'
-        self.name = '财经'
+        self.type = '财经'
         self.list_parse_func = self.parse_list_items
 
     @staticmethod
@@ -145,7 +145,7 @@ class STCNColumn(STCNBase):
         self.base_url = "http://space.stcn.com/tg"
         self.first_url = 'http://space.stcn.com/tg/index.html'
         self.format_url = 'http://space.stcn.com/tg/index_{}.html'
-        self.name = '专栏'
+        self.type = '专栏'
 
     def parse_list_body(self, body):
         doc = html.fromstring(body)
@@ -189,7 +189,7 @@ class STCNMarket(STCNBase):
         self.base_url = "http://stock.stcn.com/"
         self.first_url = 'http://stock.stcn.com/index.html'
         self.format_url = 'http://stock.stcn.com/index_{}.html'
-        self.name = '股市'
+        self.type = '股市'
         self.list_parse_func = utils.parse_list_items_1
 
 
@@ -204,7 +204,7 @@ class STCNCompany(STCNBase):
         self.base_url = "http://company.stcn.com/"
         self.first_url = 'https://company.stcn.com/index.html'
         self.format_url = 'https://company.stcn.com/index_{}.html'
-        self.name = '公司'
+        self.type = '公司'
         self.list_parse_func = utils.parse_list_items_1
 
     def parse_list_body(self, body):
@@ -229,7 +229,7 @@ class STCNYaoWen(STCNBase):
         self.base_url = "http://news.stcn.com/"
         self.first_url = 'https://news.stcn.com/news/index.html'       # 第 1 页
         self.format_url = 'https://news.stcn.com/news/index_{}.html'   # 从 1 开始是第 2 页
-        self.name = '要闻'
+        self.type = '要闻'
         self.list_parse_func = utils.parse_list_items_1
 
     def parse_list_body(self, body):
@@ -249,7 +249,7 @@ class STCNRoll(STCNBase):
         self.base_url = None
         self.first_url = 'https://www.stcn.com/gd/index.html'
         self.format_url = "https://www.stcn.com/gd/index_{}.html"
-        self.name = '滚动'
+        self.type = '滚动'
 
     def parse_list_body(self, body):
         items = []
@@ -277,7 +277,7 @@ class STCNSDBD(STCNBase):
         self.base_url = 'https://news.stcn.com/sd/'
         self.first_url = 'https://news.stcn.com/sd/index.html'
         self.format_url = "https://news.stcn.com/sd/index_{}.html"
-        self.name = '深度'
+        self.type = '深度'
         self.list_parse_func = utils.parse_list_items_1
 
 
@@ -287,7 +287,7 @@ class STCNXWPL(STCNBase):
         self.base_url = 'https://news.stcn.com/pl/'
         self.first_url = 'https://news.stcn.com/pl/index.html'
         self.format_url = "https://news.stcn.com/pl/index_{}.html"
-        self.name = '评论'
+        self.type = '评论'
         self.list_parse_func = utils.parse_list_items_1
 
 
@@ -310,7 +310,7 @@ class STCNFinance(STCNBase):
         self.base_url = None
         self.first_url = 'http://finance.stcn.com/index.html'
         self.format_url = "http://finance.stcn.com/index_{}.html"
-        self.name = '机构'
+        self.type = '机构'
         self.list_parse_func = self.parse_list_items
 
     @staticmethod
@@ -352,7 +352,7 @@ class STCNDJData(STCNBase):
         self.base_url = 'https://data.stcn.com/djsj/'
         self.first_url = 'https://data.stcn.com/djsj/index.html'
         self.format_url = 'https://data.stcn.com/djsj/index_{}.html'
-        self.name = '独家数据'
+        self.type = '独家数据'
         self.list_parse_func = self.parse_list_items
 
     @staticmethod
@@ -414,6 +414,13 @@ class STCNSchedule(SpiderBase):
             print(f"{ins.name}")
             ins.start()
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def run(self):
+        for cls in self.class_lst:
+            ins = cls()
+            print(f"{ins.type}")
+            ins.run()
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):    # TODO
@@ -441,5 +448,7 @@ if __name__ == "__main__":
     # STCNSchedule().start()
 
     STCNSchedule().trans_history()
+
+    STCNSchedule().run()
 
     pass
