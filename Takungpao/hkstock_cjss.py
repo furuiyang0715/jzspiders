@@ -66,6 +66,50 @@ class HKStock_CJSS(TakungpaoBase):
                 page_save_num = self._batch_save(self.spider_client, items, self.table_name, self.fields)
                 print(f"第{page}页保存成功的个数{page_save_num}")
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def _parse_list(self, body):
+        items = []
+        doc = html.fromstring(body)
+        news_list = doc.xpath("//div[@class='m_txt_news']/ul/li")
+        for news in news_list:
+            item = dict()
+            title = news.xpath("./a[@class='a_title']")
+            if not title:
+                title = news.xpath("./a[@class='a_title txt_blod']")
+            title = title[0].text_content()
+            item['Title'] = title
+            pub_date = news.xpath("./a[@class='a_time txt_blod']")
+            if not pub_date:
+                pub_date = news.xpath("./a[@class='a_time']")
+
+            link = pub_date[0].xpath("./@href")[0]
+            item['Website'] = link
+            pub_date = pub_date[0].text_content()
+            item['PubDatetime'] = pub_date
+            items.append(item)
+
+            detail_resp = self.get(link)
+            if detail_resp and detail_resp.status_code == 200:
+                article = self._parse_detail(detail_resp.text)
+                if article:
+                    article = self._process_content(article)
+                    item['Content'] = article
+                    # 增加合并表字段
+
+    def run(self):
+        self._spider_init()
+        for page in range(1, self.page + 1):
+            if page == 1:
+                list_url = self.first_url
+            else:
+                list_url = self.format_url.format(page)
+
+            list_resp = self.get(list_url)
+            if list_resp and list_resp.status_code == 200:
+                self.parse_list(list_resp.text)
+                # page_save_num = self._batch_save(self.spider_client, items, self.table_name, self.fields)
+                # print(f"第{page}页保存成功的个数{page_save_num}")
+
 
 class HKStock_QQGS(HKStock_CJSS):
     def __init__(self):
