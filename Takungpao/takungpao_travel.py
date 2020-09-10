@@ -91,3 +91,50 @@ class Travel(TakungpaoBase):
                 if items:
                     page_save_num = self._batch_save(self.spider_client, items, self.table_name, self.fields)
                     print("第{}页保存的个数是是{}".format(page, page_save_num))
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def parse_list(self, body):
+        doc = html.fromstring(body)
+        news_list = doc.xpath('//div[@class="txtImgListeach current"]')
+        for news in news_list:
+            item = dict()
+            link = news.xpath("./h3/a/@href")[0]
+            item['Website'] = link
+            title = news.xpath("./h3/a")[0].text_content()
+            item['Title'] = title
+            pub_date = news.xpath(".//span[@class='time']")[0].text_content()
+            item['PubDatetime'] = pub_date
+            detail_resp = self.get(link)
+            if detail_resp and detail_resp.status_code == 200:
+                detail_page = detail_resp.text
+                article = self._parse_detail(link, detail_page)
+                if article:
+                    article = self._process_content(article)
+                    item['Content'] = article
+                    # 新增合并字段
+                    item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                    item['MedName'] = self.name
+                    if not item.get('OrgMedName'):
+                        item['OrgMedName'] = self.name
+                    item['OrgTableCode'] = self.table_code
+                    self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
+    def run(self):
+        self._spider_init()
+        for page in range(1, self.page + 1):
+            if page == 1:
+                list_url = self.first_url
+            else:
+                list_url = self.format_url.format(page)
+            list_resp = self.get(list_url)
+            if list_resp and list_resp.status_code == 200:
+                list_page = list_resp.text
+                self.parse_list(list_page)
+
+
+if __name__ == '__main__':
+    # Travel().start()
+
+    Travel().run()
+
+    pass
