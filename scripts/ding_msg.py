@@ -15,7 +15,9 @@ class DingDemo(SpiderBase):
             msg += '{} 今日新增 {}\n'.format(chiname, inc_count)
         # TODO 计算总计新增
 
-        sql2 = ''''''
+        sql2 = '''SELECT count(id) as inc_count FROM OriginSpiderAll WHERE CreateTime > date_sub(CURDATE(), interval 1 day);'''
+        all_count = self.spider_client.select_one(sql2).get("inc_count")
+        msg += '截止当日目前总计新增 {}\n'.format(all_count)
 
         print(msg)
 
