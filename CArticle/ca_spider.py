@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 from lxml import html
 
 from base_spider import SpiderBase
+from scripts import utils
 
 
 class CArticleSpiser(SpiderBase):
@@ -22,6 +23,8 @@ class CArticleSpiser(SpiderBase):
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.117 Safari/537.36",
         }
         self.table_name = "eastmoney_carticle"
+        info = utils.org_tablecode_map.get(self.table_name)
+        self.name, self.table_code = info[0], info[1]
         self.fields = ['pub_date', 'code', 'title', 'link', 'article']
 
     def make_query_params(self, msg, page):
@@ -143,19 +146,26 @@ class CArticleSpiser(SpiderBase):
 
             for data in list_infos:
                 item = dict()
-                item['code'] = self.key
+                item['SecuCode'] = self.key
                 link = data.get("ArticleUrl")
-                item['link'] = link
-                item['title'] = data.get("Title")
-                item['pub_date'] = data.get("ShowTime")
+                item['Website'] = link
+                item['Title'] = data.get("Title")
+                item['PubDatetime'] = data.get("ShowTime")
                 detail_page = self.get_detail(link)
                 if not detail_page:
                     print(f"详情页解析失败{link}")
                     continue
                 article = self.parse_detail(detail_page)
-                item['article'] = article
+                item['Content'] = article
+                # 增加合并表字段
+                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
+                data['MedName'] = self.name
+                data['OrgMedName'] = self.name
+                data['OrgTableCode'] = self.table_code
                 print(item)
-                time.sleep(3)
+                self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
+            time.sleep(3)
 
 
 if __name__ == '__main__':
