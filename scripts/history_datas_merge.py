@@ -62,6 +62,10 @@ class MergeHistory(SpiderBase):
 
         self.spider_client.insert(sql)
         self.spider_client.end()
+        '''
+        `CREATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP,
+        `UPDATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, 
+        '''
 
     def start(self):
         self._create_table()

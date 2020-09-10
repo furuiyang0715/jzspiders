@@ -61,10 +61,13 @@ class DockerSwith(SpiderBase, Daemon):
         msg = ''
         from scripts.utils import org_tablecode_map
         for tablename, info in org_tablecode_map.items():
-            tablecode, chiname = info[0], info[1]
+            chiname, tablecode = info[0], info[1]
             sql = '''SELECT count(id) as inc_count FROM {} WHERE OrgTableCode = {} and {} > date_sub(CURDATE(), interval 1 day);'''.format("OriginSpiderAll", tablecode, "CreateTime")
             inc_count = self.spider_client.select_one(sql).get("inc_count")
             msg += '{} 今日新增 {}\n'.format(chiname, inc_count)
+        # TODO 计算总计新增
+
+        sql2 = ''''''
         if not LOCAL:
             self.ding(msg)
         else:

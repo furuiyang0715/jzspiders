@@ -147,8 +147,6 @@ class STCNBase(SpiderBase):
                     data['Title'] = item.get("title")
                     data['Website'] = item.get("link")
                     data['Content'] = item.get("article")
-                    data['CreateTime'] = item.get("CREATETIMEJZ")
-                    data['UpdateTime'] = item.get("UPDATETIMEJZ")
 
                     data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
                     data['MedName'] = self.name

@@ -153,8 +153,6 @@ secureScore=50\
             data['Title'] = item.get("title")
             data['Website'] = item.get("link")
             data['Content'] = item.get("article")
-            data['CreateTime'] = item.get("CREATETIMEJZ")
-            data['UpdateTime'] = item.get("UPDATETIMEJZ")
             # 增加合并表的字段
             data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
             data['MedName'] = self.name
