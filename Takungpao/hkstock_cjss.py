@@ -156,16 +156,16 @@ class HKStock_GJJJ(HKStock_CJSS):
 
 
 if __name__ == '__main__':
-    # HKStock_CJSS().run()
+    HKStock_CJSS().run()
 
-    # HKStock_QQGS().run()
+    HKStock_QQGS().run()
 
-    # HKStock_JJYZ().run()
+    HKStock_JJYZ().run()
 
     HKStock_JGSD().run()
 
-    # HKStock_GSYW().run()
+    HKStock_GSYW().run()
 
-    # HKStock_GJJJ().run()
+    HKStock_GJJJ().run()
 
     pass
