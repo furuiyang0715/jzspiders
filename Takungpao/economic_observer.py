@@ -45,7 +45,7 @@ class EconomicObserver(TakungpaoBase):
                 if article:
                     article = self._process_content(article)
                     item['article'] = article
-                    # print(item)
+                    print(item)
                     items.append(item)
         return items
 
@@ -85,12 +85,13 @@ class EconomicObserver(TakungpaoBase):
                 if article:
                     article = self._process_content(article)
                     item['Content'] = article
-
+                    # 新增合并字段
                     item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
                     item['MedName'] = self.name
-                    if not item['OrgMedName']:
+                    if not item.get('OrgMedName'):
                         item['OrgMedName'] = self.name
                     item['OrgTableCode'] = self.table_code
+                    self._save(self.spider_client, item, self.merge_table, self.merge_fields)
 
     def run(self):
         self._spider_init()
@@ -100,3 +101,9 @@ class EconomicObserver(TakungpaoBase):
             else:
                 list_url = self.format_url.format(page)
             self.parse_list(list_url)
+
+
+if __name__ == '__main__':
+    EconomicObserver().run()
+
+    pass
