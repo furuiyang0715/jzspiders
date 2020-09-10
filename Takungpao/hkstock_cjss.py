@@ -94,7 +94,13 @@ class HKStock_CJSS(TakungpaoBase):
                 if article:
                     article = self._process_content(article)
                     item['Content'] = article
-                    # 增加合并表字段
+                    # 新增合并字段
+                    item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                    item['MedName'] = self.name
+                    if not item.get('OrgMedName'):
+                        item['OrgMedName'] = self.name
+                    item['OrgTableCode'] = self.table_code
+                    self._save(self.spider_client, item, self.merge_table, self.merge_fields)
 
     def run(self):
         self._spider_init()
@@ -103,12 +109,10 @@ class HKStock_CJSS(TakungpaoBase):
                 list_url = self.first_url
             else:
                 list_url = self.format_url.format(page)
-
+            print(list_url)
             list_resp = self.get(list_url)
             if list_resp and list_resp.status_code == 200:
-                self.parse_list(list_resp.text)
-                # page_save_num = self._batch_save(self.spider_client, items, self.table_name, self.fields)
-                # print(f"第{page}页保存成功的个数{page_save_num}")
+                self._parse_list(list_resp.text)
 
 
 class HKStock_QQGS(HKStock_CJSS):
@@ -149,3 +153,19 @@ class HKStock_GJJJ(HKStock_CJSS):
         self.type = '国际聚焦'
         self.first_url = 'http://finance.takungpao.com/hkstock/gjjj/index.html'
         self.format_url = "http://finance.takungpao.com/hkstock/gjjj/index_{}.html"
+
+
+if __name__ == '__main__':
+    # HKStock_CJSS().run()
+
+    # HKStock_QQGS().run()
+
+    # HKStock_JJYZ().run()
+
+    HKStock_JGSD().run()
+
+    # HKStock_GSYW().run()
+
+    # HKStock_GJJJ().run()
+
+    pass
