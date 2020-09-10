@@ -113,6 +113,49 @@ class ZhongGuoJingJi(TakungpaoBase):
                 list_url = self.format_url.format(page)
             self._parse_list(page, list_url)
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def parse_list(self, list_url):
+        """解析列表页"""
+        list_resp = self.get(list_url)
+        if list_resp and list_resp.status_code == 200:
+            list_page = list_resp.text
+            doc = html.fromstring(list_page)
+            news_list = doc.xpath('//div[@class="wrap_left"]/dl[@class="item clearfix"]')
+            for news in news_list:
+                item = {}
+                link = news.xpath('./dd[@class="intro"]/a/@href')[0]
+                item['Website'] = link
+                title = news.xpath("./dd/a/@title")[0]
+                title = self._process_content(title)
+                title = title.replace("\ufeff", '')
+                item['Title'] = title
+                pub_date = news.xpath("./dd[@class='sort']/text()")[0]
+                pub_date = self._process_pub_dt(pub_date)
+                item['PubDatetime'] = pub_date
+                ret = self._parse_detail(link)
+                item['Content'] = ret.get("content")
+                item['OrgMedName'] = ret.get("source")
+                # 新增合并字段
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                if not item.get('OrgMedName'):
+                    item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
+    def run(self):
+        self._spider_init()
+        page = self._parse_total_page(self.first_url)
+        print("总页数 {}".format(page))
+        page = 2
+        for page in range(1, page + 1):
+            print("PAGE {}".format(page))
+            if page == 1:
+                list_url = self.first_url
+            else:
+                list_url = self.format_url.format(page)
+            self.parse_list(list_url)
+
 
 class NewFinanceTrend(ZhongGuoJingJi):
     """废弃"""
@@ -161,3 +204,19 @@ class Business(ZhongGuoJingJi):
         self.type = '商业'
         self.first_url = 'http://www.takungpao.com/finance/236137/index.html'
         self.format_url = 'http://www.takungpao.com/finance/236137/{}.html'
+
+
+if __name__ == '__main__':
+    ZhongGuoJingJi().run()
+
+    HKCaiJing().run()
+
+    HKStock().run()
+
+    GuoJiJingJi().run()
+
+    DiChan().run()
+
+    Business().run()
+
+    pass
