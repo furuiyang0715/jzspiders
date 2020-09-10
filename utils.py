@@ -45,3 +45,12 @@ if __name__ == '__main__':
         clear_all_containers()
         build_docker_image()
         start_main_thread()
+
+
+'''部署流程 
+（1） 同步到服务器:  python utils.py 1; 检查 .conf 文件中的 LOCAL 为 0 
+（2） 激活服务器虚拟环境：  source /home/furuiyang/jzspi/bin/activate 
+（3） 清理旧容器、构建、启动: python utils.py 5 
+
+
+'''
