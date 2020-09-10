@@ -158,10 +158,10 @@ class CArticleSpiser(SpiderBase):
                 article = self.parse_detail(detail_page)
                 item['Content'] = article
                 # 增加合并表字段
-                data['DupField'] = "{}_{}".format(self.table_code, data['Website'])
-                data['MedName'] = self.name
-                data['OrgMedName'] = self.name
-                data['OrgTableCode'] = self.table_code
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
                 print(item)
                 self._save(self.spider_client, item, self.merge_table, self.merge_fields)
 

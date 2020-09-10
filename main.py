@@ -42,13 +42,27 @@ class DockerSwith(SpiderBase, Daemon):
         self.docker_client = docker.from_env()
         self.docker_containers_col = self.docker_client.containers
 
+    # def ding_crawl_information(self):
+    #     self._spider_init()
+    #     msg = ''
+    #     for table, info in spiders_config.items():
+    #         dt_benchmark = info[-2]
+    #         chiname = info[-1]
+    #         sql = '''SELECT count(id) as inc_count FROM {} WHERE {} > date_sub(CURDATE(), interval 1 day);'''.format(table, dt_benchmark)
+    #         inc_count = self.spider_client.select_one(sql).get("inc_count")
+    #         msg += '{} 今日新增 {}\n'.format(chiname, inc_count)
+    #     if not LOCAL:
+    #         self.ding(msg)
+    #     else:
+    #         print(msg)
+
     def ding_crawl_information(self):
         self._spider_init()
         msg = ''
-        for table, info in spiders_config.items():
-            dt_benchmark = info[-2]
-            chiname = info[-1]
-            sql = '''SELECT count(id) as inc_count FROM {} WHERE {} > date_sub(CURDATE(), interval 1 day);'''.format(table, dt_benchmark)
+        from scripts.utils import org_tablecode_map
+        for tablename, info in org_tablecode_map.items():
+            tablecode, chiname = info[0], info[1]
+            sql = '''SELECT count(id) as inc_count FROM {} WHERE OrgTableCode = {} and {} > date_sub(CURDATE(), interval 1 day);'''.format("OriginSpiderAll", tablecode, "CreateTime")
             inc_count = self.spider_client.select_one(sql).get("inc_count")
             msg += '{} 今日新增 {}\n'.format(chiname, inc_count)
         if not LOCAL:
