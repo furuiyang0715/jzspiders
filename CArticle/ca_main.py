@@ -29,7 +29,7 @@ class CaSchedule(SpiderBase):
         dc_info = {r['SecuCode']: r['ChiNameAbbr'] for r in datas}
         return dc_info
 
-    def run(self, key):
+    def launch(self, key):
         CArticleSpiser(key=key).start()
 
     def _create_table(self):
@@ -57,7 +57,14 @@ class CaSchedule(SpiderBase):
         self._create_table()
         for key in self.keys:
             print("当前的主题是: {}".format(key))
-            self.run(key)
+            self.launch(key)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def run(self):
+        self._spider_init()
+        for key in self.keys:
+            print("当前的主题是: {}".format(key))
+            CArticleSpiser(key=key).run()
 
     def trans_history(self):
         self._spider_init()
@@ -93,6 +100,8 @@ from {} where IsMeg = 0 limit {}, 1000; '''.format(self.table_name, i*1000)
 if __name__ == "__main__":
     # CaSchedule().start()
 
-    CaSchedule().trans_history()
+    # CaSchedule().trans_history()
+
+    CaSchedule().run()
 
     pass

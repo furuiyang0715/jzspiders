@@ -126,6 +126,41 @@ class CArticleSpiser(SpiderBase):
         ret = self._batch_save(self.spider_client, items, self.table_name, self.fields)
         print(f'入库个数{ret}')
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def run(self):
+        self._spider_init()
+        for page in range(1, 2):
+            list_url = self.start_url + urlencode(self.make_query_params(self.key, page))
+            print(list_url)
+            list_page = self.get_list_page(list_url)
+            if not list_page:
+                print("列表页请求失败")
+                return
+            list_infos = self.parse_list(list_page)
+            if not list_infos:
+                print("列表页面数据解析失败")
+                return
+
+            for data in list_infos:
+                item = dict()
+                item['code'] = self.key
+                link = data.get("ArticleUrl")
+                item['link'] = link
+                item['title'] = data.get("Title")
+                item['pub_date'] = data.get("ShowTime")
+                detail_page = self.get_detail(link)
+                if not detail_page:
+                    print(f"详情页解析失败{link}")
+                    continue
+                article = self.parse_detail(detail_page)
+                item['article'] = article
+                print(item)
+                time.sleep(3)
+
 
 if __name__ == '__main__':
-    CArticleSpiser("视源股份").start()
+    # CArticleSpiser("视源股份").start()
+
+    CArticleSpiser("视源股份").run()
+
+    pass
