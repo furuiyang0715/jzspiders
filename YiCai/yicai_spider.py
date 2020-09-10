@@ -93,6 +93,40 @@ class YiCai(SpiderBase):
             ret = self._batch_save(self.spider_client, items, self.table_name, self.fields)
             print(f'{self.name} 本页入库个数{ret}')
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def _get_list_items(self, page):
+        resp = requests.get(self.url.format(page))
+        if resp and resp.status_code == 200:
+            body = resp.text
+            datas = json.loads(body)
+            for one in datas:
+                item = dict()
+                _date_str = one.get("LastDate")
+                _date = datetime.datetime.strptime(_date_str, "%Y-%m-%dT%H:%M:%S")
+                item['PubDatetime'] = _date
+                _url = one.get("url")
+                if "video" in _url:
+                    continue
+                link = "https://www.yicai.com" + _url
+                item['Website'] = link
+                item['Title'] = one.get("NewsTitle")
+                item['OrgMedName'] = one.get("NewsSource")
+                # item['author'] = one.get("NewsAuthor")
+                detail = self.fetch_detail_page(link)
+                item['Content'] = detail
+                # 增加合并字段
+                item['DupField'] = "{}_{}".format(self.table_code, item['Website'])
+                item['MedName'] = self.name
+                if not item['OrgMedName']:
+                    item['OrgMedName'] = self.name
+                item['OrgTableCode'] = self.table_code
+                self._save(self.spider_client, item, self.merge_table, self.merge_fields)
+
+    def run(self):
+        self._spider_init()
+        for page in range(1, 2):
+            self._get_list_items(page)
+
     def trans_history(self):
         self._spider_init()
         for i in range(1000):  # TODO
@@ -120,6 +154,8 @@ from {} limit {}, 1000; '''.format(self.table_name, i * 1000)
 if __name__ == "__main__":
     # YiCai().start()
 
-    YiCai().trans_history()
+    # YiCai().trans_history()
+
+    YiCai().run()
 
     pass
