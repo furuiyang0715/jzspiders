@@ -31,7 +31,7 @@ org_tablecode_map = {
 
     'gov_stats': ['国家统计局', 1061, ],
 
-    'chinabank': ['中国银行', 1062, ],
+    'chinabank': ['中国人民银行', 1062, ],
 
     'qq_Astock_news': ['腾讯财经[A股]', 1023, ],
 
