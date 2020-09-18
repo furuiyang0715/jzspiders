@@ -19,7 +19,9 @@ class Taoguba(SpiderBase):
         super(Taoguba, self).__init__()
         self.headers.update({
             'referer': 'https://www.taoguba.com.cn/quotes/sz000651',
-            'cookie': '''CNZZDATA1574657=cnzz_eid%3D2032531684-1597730592-https%253A%252F%252Fsso.taoguba.com.cn%252F%26ntime%3D1597730592; UM_distinctid=17400765cb728-034a859c29eee5-31667305-1fa400-17400765cb8b0d; Hm_lvt_cc6a63a887a7d811c92b7cc41c441837=1597734092; tgbuser=3707036; tgbpwd=788435B9672s589xtktbhcmeck; JSESSIONID=daacf72f-a420-4ee0-8ae1-e1ea2cb60d95; Hm_lpvt_cc6a63a887a7d811c92b7cc41c441837=1597735800''',
+            # 'cookie': '''CNZZDATA1574657=cnzz_eid%3D2032531684-1597730592-https%253A%252F%252Fsso.taoguba.com.cn%252F%26ntime%3D1597730592; UM_distinctid=17400765cb728-034a859c29eee5-31667305-1fa400-17400765cb8b0d; Hm_lvt_cc6a63a887a7d811c92b7cc41c441837=1597734092; tgbuser=3707036; tgbpwd=788435B9672s589xtktbhcmeck; JSESSIONID=daacf72f-a420-4ee0-8ae1-e1ea2cb60d95; Hm_lpvt_cc6a63a887a7d811c92b7cc41c441837=1597735800''',
+            'cookie': 'UM_distinctid=17400765cb728-034a859c29eee5-31667305-1fa400-17400765cb8b0d; CNZZDATA1574657=cnzz_eid%3D2032531684-1597730592-https%253A%252F%252Fsso.taoguba.com.cn%252F%26ntime%3D1600397329; Hm_lvt_cc6a63a887a7d811c92b7cc41c441837=1600397946; __gads=ID=106b9d387cc49239:T=1600397965:S=ALNI_MbQSxh8dj8GTY_vy7mo9aoKJWOMUA; tgbuser=3707036; tgbpwd=788435B9672s589xtktbhcmeck; JSESSIONID=aa0a58a8-66a1-4c5e-a29a-02841c673a3d; Hm_lpvt_cc6a63a887a7d811c92b7cc41c441837=1600399007',
+
         })
         # print(pprint.pformat(self.headers))
         self.name = name
