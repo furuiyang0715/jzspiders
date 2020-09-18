@@ -38,7 +38,7 @@ def get_cookies():
             command_executor='http://127.0.0.1:32773/wd/hub',
             desired_capabilities={'browserName': 'chrome'},
         )
-        driver.set_window_size(1124, 850)  # 防止得到的WebElement的状态is_displayed为False，即不可见
+        driver.set_window_size(1124, 850)  # 防止得到的 WebElement 的状态 is_displayed 为 False，即不可见
         driver.get(login_index)
         user_name = driver.find_element_by_id('userName')
         user_name.send_keys(loginname)
@@ -46,7 +46,9 @@ def get_cookies():
         pass_word.send_keys(password)
         submit = driver.find_element_by_id('loginbtn1')
         submit.click()
-        cookies = driver.get_cookies()
+        cookies = {}
+        for cookie in driver.get_cookies():
+            cookies[cookie['name']] = cookie['value']
         print(pprint.pformat(cookies))
     except Exception:
         traceback.print_exc()
@@ -62,7 +64,6 @@ def sele_login():
     )
     browser.get(login_index)
     text = browser.page_source
-    # print(text)
     print("loginContent" in text)
     browser.quit()
 
