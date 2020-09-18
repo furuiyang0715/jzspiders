@@ -8,6 +8,7 @@
 Py2.7.10 Py3.4 windows 测试通过
 如果遇到 requests ssl 的问题 请升级你的 requests 的版本，或者 Python 的版本
 '''
+import json
 
 import requests
 import hashlib
@@ -47,8 +48,14 @@ def login(telephone, password):
     headers['Referer'] = "https://xueqiu.com/"
     resp = session.get(first_url, headers=headers)
     print(resp)
-    resp2 = requests.get(first_url)
-    print(resp2)
+    if resp and resp.status_code == 200:
+        text = resp.text
+        print(text)
+        py_data = json.loads(text)
+        items = py_data.get("items")
+
+    # resp2 = requests.get(first_url)
+    # print(resp2)
     # login_url_api = "https://xueqiu.com/service/csrf?api=%2Fuser%2Flogin"  # 模拟更真实的请求
     # session.get(login_url_api, headers=headers)
     # login_url = "https://xueqiu.com/user/login"
