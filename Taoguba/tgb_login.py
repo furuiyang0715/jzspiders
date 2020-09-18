@@ -32,30 +32,27 @@ def post_api():
 def get_cookies():
     loginname = 'ruiyang'
     password = 'qazwsxedc'
+    driver = None
     try:
         driver = webdriver.Remote(
-            command_executor='http://127.0.0.1:32772/wd/hub',
+            command_executor='http://127.0.0.1:32773/wd/hub',
             desired_capabilities={'browserName': 'chrome'},
         )
         driver.set_window_size(1124, 850)  # 防止得到的WebElement的状态is_displayed为False，即不可见
         driver.get(login_index)
-        username = driver.find_element_by_xpath('//input[@id="userName"]')
-        # print(username)
-        # print(username.clear())
-        # print(username.send_keys(loginname))
-        # driver.find_element_by_xpath('//[@id="userName"]').send_keys(loginname)
-        # time.sleep(2)
-        # driver.find_element_by_xpath('//[@id="userPassword"]').send_keys(password)
-        # driver.find_element_by_xpath('//*[@id="pl_login_form"]/div/div[3]/div[6]/a').click()
-
+        user_name = driver.find_element_by_id('userName')
+        user_name.send_keys(loginname)
+        pass_word = driver.find_element_by_id('password1')
+        pass_word.send_keys(password)
+        submit = driver.find_element_by_id('loginbtn1')
+        submit.click()
         cookies = driver.get_cookies()
         print(pprint.pformat(cookies))
-
-        driver.quit()
     except Exception:
         traceback.print_exc()
     finally:
-        pass
+        if driver:
+            driver.quit()
 
 
 def sele_login():
@@ -80,3 +77,16 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+'''
+https://my.oschina.net/fxtxz2/blog/3055390
+
+http://www.python3.vip/tut/auto/selenium/01/ 
+
+
+sudo docker run -d -P --name myhub selenium/hub 
+sudo docker run -d --link myhub:hub --name node selenium/node-chrome 
+
+
+'''

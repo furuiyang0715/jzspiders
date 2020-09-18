@@ -3,7 +3,7 @@ from selenium import webdriver
 # browser = webdriver.Chrome()
 
 browser = webdriver.Remote(
-    command_executor='http://127.0.0.1:32772/wd/hub',
+    command_executor='http://127.0.0.1:32773/wd/hub',
     desired_capabilities={'browserName': 'chrome'},
 )
 browser.get('http://www.baidu.com/')
