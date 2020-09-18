@@ -22,7 +22,9 @@ class XueQiuKuaiXun(SpiderBase):
         self.base_api = 'https://xueqiu.com/statuses/livenews/list.json?since_id=-1&max_id={}&count=15'
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
-            'Cookie': 's=dk1af2e0xx; device_id=225b7001f44831dd2c0ef9a0a27c309c; __utma=1.390898764.1595042617.1595042617.1595042617.1; __utmz=1.1595042617.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); aliyungf_tc=AQAAADZ1qkEJjAIA4U5tcaMBWxG5jhDi; xq_a_token=4db837b914fc72624d814986f5b37e2a3d9e9944; xqat=4db837b914fc72624d814986f5b37e2a3d9e9944; xq_r_token=2d6d6cc8e57501dfe571d2881cabc6a5f2542bf8; xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOi0xLCJpc3MiOiJ1YyIsImV4cCI6MTYwMDQ4MzAwNywiY3RtIjoxNTk3OTE1NjU0NjMzLCJjaWQiOiJkOWQwbjRBWnVwIn0.Xv18aNMnTCbBSBdBeEBlebGCJRVna9F89ghYs2iTc2zXztEJJ6az2lWMX7E78Nt1aVY97kPhNMs0IcCtHWX7WOX3xqZMUQpUi_ZbDTv7vUoOIBKB27jtenSkM6i_u3pgDrVvyXngbcnof-zKv86LzfcgQSCL3GcnmtwHFmoXctumpD8Z400r3m753u7uNnFOptyGJaIDIqvcF6vlBjm01b18WwYrkjIcW3ujJPGkTr38O9FYujILUQjCdRQZsTgEQfK3bPWeOJNFd8V9rMXl0tZlYN7m1yhL1DYeMqyTvCY5rvkzUQ6cWyBJJZ615auqmflzwe__i-reu-6D_6U53w; u=561597915688189; Hm_lvt_1db88642e346389874251b5a1eded6e3=1597915690,1597990683; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1597990683',
+            # 'Cookie': 's=dk1af2e0xx; device_id=225b7001f44831dd2c0ef9a0a27c309c; __utma=1.390898764.1595042617.1595042617.1595042617.1; __utmz=1.1595042617.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); aliyungf_tc=AQAAADZ1qkEJjAIA4U5tcaMBWxG5jhDi; xq_a_token=4db837b914fc72624d814986f5b37e2a3d9e9944; xqat=4db837b914fc72624d814986f5b37e2a3d9e9944; xq_r_token=2d6d6cc8e57501dfe571d2881cabc6a5f2542bf8; xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOi0xLCJpc3MiOiJ1YyIsImV4cCI6MTYwMDQ4MzAwNywiY3RtIjoxNTk3OTE1NjU0NjMzLCJjaWQiOiJkOWQwbjRBWnVwIn0.Xv18aNMnTCbBSBdBeEBlebGCJRVna9F89ghYs2iTc2zXztEJJ6az2lWMX7E78Nt1aVY97kPhNMs0IcCtHWX7WOX3xqZMUQpUi_ZbDTv7vUoOIBKB27jtenSkM6i_u3pgDrVvyXngbcnof-zKv86LzfcgQSCL3GcnmtwHFmoXctumpD8Z400r3m753u7uNnFOptyGJaIDIqvcF6vlBjm01b18WwYrkjIcW3ujJPGkTr38O9FYujILUQjCdRQZsTgEQfK3bPWeOJNFd8V9rMXl0tZlYN7m1yhL1DYeMqyTvCY5rvkzUQ6cWyBJJZ615auqmflzwe__i-reu-6D_6U53w; u=561597915688189; Hm_lvt_1db88642e346389874251b5a1eded6e3=1597915690,1597990683; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1597990683',
+            'Cookie': 's=dk1af2e0xx; device_id=225b7001f44831dd2c0ef9a0a27c309c; __utma=1.390898764.1595042617.1595042617.1595042617.1; __utmz=1.1595042617.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); aliyungf_tc=AQAAADZ1qkEJjAIA4U5tcaMBWxG5jhDi; Hm_lvt_1db88642e346389874251b5a1eded6e3=1597915690,1597990683,1597991491,1597991681; acw_tc=2760821816003959123427825e841d81c725fc4dd911b56880e7c2c47408c5; xq_a_token=636e3a77b735ce64db9da253b75cbf49b2518316; xqat=636e3a77b735ce64db9da253b75cbf49b2518316; xq_r_token=91c25a6a9038fa2532dd45b2dd9b573a35e28cfd; xq_id_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ1aWQiOi0xLCJpc3MiOiJ1YyIsImV4cCI6MTYwMjY0MzAyMCwiY3RtIjoxNjAwMzk1ODk5MDA3LCJjaWQiOiJkOWQwbjRBWnVwIn0.T9p8r7uzAePqX9W6BstadlZ2inHVwkfTXcL6-CsWhp9Cg_uQc9WGoWCTUcMVSP10nGyEvR7hlgK5b6_atsTB8Ke9eXDy4nNLwlflY8u4XVN-8lBgxSko2DMGV2H3pQdQmswCwxb9ZS31elEd8o13Q2ATR9OF1U5KnJZUx8fRrIBrtBlWYBytF_0PNHrfpX7Ka0lp8IunKD7UAsECZTcKLho6wXrQwdsL4__OElA2KDvoU2-oq8mq7sf7IpnlNALJPIqq6-TJip0UunIoryAIGv2vzKu8i3G8OLlJU9argup9dliQgemYPHFi3cFXF_FRzzskVi7rzFfD7yNmOYfEAw; u=121600395921114; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1600395922',
+
         }
         self.table_name = 'xueqiu_livenews'
         # self.name = '雪球快讯'
@@ -85,6 +87,7 @@ class XueQiuKuaiXun(SpiderBase):
     #  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def _fetch_datas(self, url):
         resp = requests.get(url, headers=self.headers)
+        print(resp)
         if resp and resp.status_code == 200:
             text = resp.text
             datas = json.loads(text)
@@ -113,6 +116,7 @@ class XueQiuKuaiXun(SpiderBase):
     def run(self):
         self._spider_init()
         next_url = self._fetch_datas(self.first_api)
+        print(next_url)
         while next_url:
             print(next_url)
             next_url = self._fetch_datas(next_url)
