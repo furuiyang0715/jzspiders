@@ -46,10 +46,13 @@ def get_cookies():
         pass_word.send_keys(password)
         submit = driver.find_element_by_id('loginbtn1')
         submit.click()
+        time.sleep(10)
+        driver.refresh()
         cookies = {}
         for cookie in driver.get_cookies():
             cookies[cookie['name']] = cookie['value']
         print(pprint.pformat(cookies))
+        return cookies
     except Exception:
         traceback.print_exc()
     finally:
@@ -72,8 +75,17 @@ def main():
     # post_api()
 
     # sele_login()
+    # cookies = {}
 
-    get_cookies()
+    # cookies = get_cookies()
+    # cookies = 'UM_distinctid=174a0a9ce9e9bc-0938a67e9ceea3-31667305-1fa400-174a0a9ce9fb16; CNZZDATA1574657=cnzz_eid%3D1766937287-1600418930-%26ntime%3D1600418930; Hm_lvt_cc6a63a887a7d811c92b7cc41c441837=1600423317; tgbuser=3707036; tgbpwd=788435B9672s589xtktbhcmeck; JSESSIONID=c60096ce-aabd-401f-b4c1-059ce998e465; Hm_lpvt_cc6a63a887a7d811c92b7cc41c441837=1600423321'
+    cookies = 'tgbuser=3707036; tgbpwd=788435B9672s589xtktbhcmeck; UM_distinctid=174a09f38717dc-0dbb36cdfd7688-31667305-1fa400-174a09f3872ca7; CNZZDATA1574657=cnzz_eid%3D1288858779-1600418930-https%253A%252F%252Fsso.taoguba.com.cn%252F%26ntime%3D1600418930; Hm_lvt_cc6a63a887a7d811c92b7cc41c441837=1600422623; JSESSIONID=a8f41248-de23-46f6-9a20-f33cb7ef431a; Hm_lpvt_cc6a63a887a7d811c92b7cc41c441837=1600422820'
+
+    url = 'https://www.taoguba.com.cn/quotes/getStockUpToDate?stockCode=sz000651&actionDate=1600422266000&perPageNum=20&isOpen=false'
+    headers.update({"cookie": cookies})
+    resp = requests.get(url, headers=headers)
+    print(resp)
+    print(resp.text)
 
 
 if __name__ == '__main__':
@@ -88,6 +100,16 @@ http://www.python3.vip/tut/auto/selenium/01/
 
 sudo docker run -d -P --name myhub selenium/hub 
 sudo docker run -d --link myhub:hub --name node selenium/node-chrome 
+
+
+tgbuser=3707036; 
+tgbpwd=788435B9672s589xtktbhcmeck; 
+
+UM_distinctid=174a09f38717dc-0dbb36cdfd7688-31667305-1fa400-174a09f3872ca7; 
+CNZZDATA1574657=cnzz_eid%3D1288858779-1600418930-https%253A%252F%252Fsso.taoguba.com.cn%252F%26ntime%3D1600418930; 
+Hm_lvt_cc6a63a887a7d811c92b7cc41c441837=1600422623; 
+JSESSIONID=a8f41248-de23-46f6-9a20-f33cb7ef431a; 
+Hm_lpvt_cc6a63a887a7d811c92b7cc41c441837=1600422820 
 
 
 '''

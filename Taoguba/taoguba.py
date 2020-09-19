@@ -206,6 +206,8 @@ class Taoguba(SpiderBase):
         tstamp = int(time.time()) * 1000  # js 中的时间戳 第一次这个值选用当前时间
         query_params = self.make_query_params(tstamp)
         start_url = self.refresh_url + urlencode(query_params)
+        print(start_url)
+
         self.refresh(start_url)
 
 
