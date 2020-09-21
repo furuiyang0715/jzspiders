@@ -19,6 +19,28 @@ def get_code_status():
     return _map
 
 
+def get_stock_json():
+    api = 'http://www.cninfo.com.cn/new/data/szse_a_stock.json?_=1600666894817'
+    headers = {
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Host': 'www.cninfo.com.cn',
+        'Origin': 'http://uc.cninfo.com.cn',
+        'Pragma': 'no-cache',
+        'Referer': 'http://uc.cninfo.com.cn/user/optionalConfig?groupId=88937',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
+    }
+    resp = requests.get(api)
+    print(resp)
+    text = resp.text
+    print(text)
+    py_data = json.loads(text).get("stockList")
+    print(py_data)
+
+
 def get_user_list():
     '''
     stock: 000651,gssz0000651;002841,9900029752
@@ -102,4 +124,6 @@ def get_user_list():
 if __name__ == '__main__':
     # get_user_list()
 
-    get_code_status()
+    # get_code_status()
+
+    get_stock_json()
