@@ -111,7 +111,6 @@ class JuChaoSearch(SpiderBase):
             'Pragma': 'no-cache',
             'Referer': 'http://uc.cninfo.com.cn/user/optionalNotice',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
-
         }
 
         resp = requests.post(url, data=post_data, headers=headers)
@@ -212,12 +211,58 @@ class JuChaoSearch(SpiderBase):
         print(pprint.pformat(_map))
         return _map
 
+    def query_history(self):
+        api = 'http://www.cninfo.com.cn/new/hisAnnouncement/query'
+        post_data = {
+            'pageNum': 1, 
+            'pageSize': 30, 
+            'column': 'szse',
+            'tabName': 'fulltext',
+            'plate': '',  
+            'stock': '000001,gssz0000001', 
+            'searchkey': '',
+            'secid': '',
+            'category': '',
+            'trade': '',
+            'seDate': '2020-03-21~2020-09-22',
+            'sortName': '',
+            'sortType': '',
+            'isHLtitle': 'true',
+        }
+
+        headers = {
+            # 'Accept': '*/*',
+            # 'Accept-Encoding': 'gzip, deflate',
+            # 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+            # 'Cache-Control': 'no-cache',
+            # 'Connection': 'keep-alive',
+            # 'Content-Length': '183',
+            # 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            # 'Cookie': 'JSESSIONID=62B3DD042FE68A7569EBBD4A5D77725F; UC-JSESSIONID=2C4A8072D9088E2B55877BDA0380B541; _sp_ses.2141=*; _sp_id.2141=a878da76-08ce-42a8-9c5b-7e4ec1df3721.1597628172.8.1600673253.1600656098.7fb85f15-9771-48f0-be38-23113cced2d9',
+            # 'Host': 'www.cninfo.com.cn',
+            # 'Origin': 'http://www.cninfo.com.cn',
+            # 'Pragma': 'no-cache',
+            # 'Referer': 'http://www.cninfo.com.cn/new/commonUrl/pageOfSearch?url=disclosure/list/search&lastPage=index',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
+            # 'X-Requested-With': 'XMLHttpRequest',
+        }
+
+        resp = requests.post(api, headers=headers, data=post_data)
+        if resp.status_code == 200:
+            text = resp.text
+            print(text)
+        else:
+            print(resp)
+
 
 if __name__ == '__main__':
     ins = JuChaoSearch()
     # ins.create_tools_table()
     # ins.get_stock_json()
-
     # ins.get_user_list()
+    # ins.get_ant_type()
 
-    ins.get_ant_type()
+    ins.query_history()
+
+
+    pass
