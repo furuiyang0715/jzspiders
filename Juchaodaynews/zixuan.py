@@ -2,23 +2,26 @@
 import datetime
 import json
 import pprint
+import sys
+import time
 
 import requests
 
+from base_spider import SpiderBase
 
-class JuChaoSearch(object):
 
-    def get_code_status(self):
-        # api = '''http://uc.cninfo.com.cn/portfolio/getBatchStocksSelectedStatus'''
-        text = '''{"list":[{"stockCode":"000895","organId":"gssz0000895","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":true},{"stockCode":"300117","organId":"9900013439","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"603288","organId":"9900023228","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600519","organId":"gssh0600519","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"000651","organId":"gssz0000651","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":true},{"stockCode":"002726","organId":"9900023003","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600887","organId":"gssh0600887","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600566","organId":"gssh0600566","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"002372","organId":"9900011087","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"601933","organId":"9900016367","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false}],"success":"true"}'''
-        py_data = json.loads(text).get("list")
-        _map = dict()
-        for one in py_data:
-            _map[one.get("stockCode")] = one.get("organId")
-        print(_map)
-        print(pprint.pformat(_map))
-        print(len(_map))
-        return _map
+class JuChaoSearch(SpiderBase):
+    def __init__(self):
+        super(JuChaoSearch, self).__init__()
+
+    # def get_code_status(self):
+    #     # api = '''http://uc.cninfo.com.cn/portfolio/getBatchStocksSelectedStatus'''
+    #     text = '''{"list":[{"stockCode":"000895","organId":"gssz0000895","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":true},{"stockCode":"300117","organId":"9900013439","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"603288","organId":"9900023228","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600519","organId":"gssh0600519","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"000651","organId":"gssz0000651","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":true},{"stockCode":"002726","organId":"9900023003","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600887","organId":"gssh0600887","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600566","organId":"gssh0600566","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"002372","organId":"9900011087","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"601933","organId":"9900016367","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false}],"success":"true"}'''
+    #     py_data = json.loads(text).get("list")
+    #     _map = dict()
+    #     for one in py_data:
+    #         _map[one.get("stockCode")] = one.get("organId")
+    #     return _map
 
     def create_tools_table(self):
         sql = '''
@@ -32,13 +35,18 @@ class JuChaoSearch(object):
             `CREATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP,
             `UPDATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
-            UNIQUE KEY `orgId` (`orgId`),
+            UNIQUE KEY `orgId_code` (`orgId`, `code`),
             KEY `update_time` (`UPDATETIMEJZ`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='巨潮证券编码';
         '''
+        self._spider_init()
+        self.spider_client.insert(sql)
+        self.spider_client.end()
 
     def get_stock_json(self):
-        api = 'http://www.cninfo.com.cn/new/data/szse_a_stock.json?_=1600666894817'
+        # api = 'http://www.cninfo.com.cn/new/data/szse_a_stock.json?_=1600666894817'
+
+        api = 'http://www.cninfo.com.cn/new/data/szse_a_stock.json?_={}'.format(int(time.time() * 1000))
         headers = {
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'Accept-Encoding': 'gzip, deflate',
@@ -51,12 +59,17 @@ class JuChaoSearch(object):
             'Referer': 'http://uc.cninfo.com.cn/user/optionalConfig?groupId=88937',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
         }
-        resp = requests.get(api)
+        resp = requests.get(api, headers=headers)
         print(resp)
         text = resp.text
-        print(text)
+        # print(text)
         py_data = json.loads(text).get("stockList")
-        print(py_data)
+        # print(py_data)
+        # print(len(py_data))
+        self._spider_init()
+        fields = ['code', 'orgId', 'category', 'pinyin', 'zwjc']
+        for one in py_data:
+            self._save(self.spider_client, one, 'juchao_codemap', fields)
 
     def get_user_list(self):
         '''
@@ -140,9 +153,5 @@ class JuChaoSearch(object):
 
 if __name__ == '__main__':
     ins = JuChaoSearch()
-
-    # ins.get_user_list()
-
-    # ins.get_code_status()
-
+    ins.create_tools_table()
     ins.get_stock_json()
