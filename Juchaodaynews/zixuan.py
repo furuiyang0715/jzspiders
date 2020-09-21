@@ -5,7 +5,18 @@ import pprint
 
 import requests
 
-url = '''http://www.cninfo.com.cn/new/userAnnouncement/getUserAnnouncementsList'''
+
+def get_code_status():
+    # api = '''http://uc.cninfo.com.cn/portfolio/getBatchStocksSelectedStatus'''
+    text = '''{"list":[{"stockCode":"000895","organId":"gssz0000895","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":true},{"stockCode":"300117","organId":"9900013439","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"603288","organId":"9900023228","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600519","organId":"gssh0600519","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"000651","organId":"gssz0000651","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":true},{"stockCode":"002726","organId":"9900023003","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600887","organId":"gssh0600887","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600566","organId":"gssh0600566","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"002372","organId":"9900011087","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"601933","organId":"9900016367","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false}],"success":"true"}'''
+    py_data = json.loads(text).get("list")
+    _map = dict()
+    for one in py_data:
+        _map[one.get("stockCode")] = one.get("organId")
+    print(_map)
+    print(pprint.pformat(_map))
+    print(len(_map))
+    return _map
 
 
 def get_user_list():
@@ -19,6 +30,7 @@ def get_user_list():
     pageNum: 1
     pageSize: 20
     '''
+    url = '''http://www.cninfo.com.cn/new/userAnnouncement/getUserAnnouncementsList'''
     post_data = {
         'stock': '000651,gssz0000651;002841,9900029752',
         'searchkey': '',
@@ -88,4 +100,6 @@ def get_user_list():
 
 
 if __name__ == '__main__':
-    get_user_list()
+    # get_user_list()
+
+    get_code_status()
