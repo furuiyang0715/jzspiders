@@ -13,6 +13,7 @@ from base_spider import SpiderBase
 class JuChaoSearch(SpiderBase):
     def __init__(self):
         super(JuChaoSearch, self).__init__()
+        self.table_name = 'juchao_ant'
 
     # def get_code_status(self):
     #     # api = '''http://uc.cninfo.com.cn/portfolio/getBatchStocksSelectedStatus'''
@@ -60,7 +61,7 @@ class JuChaoSearch(SpiderBase):
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
         }
         resp = requests.get(api, headers=headers)
-        print(resp)
+        # print(resp)
         text = resp.text
         # print(text)
         py_data = json.loads(text).get("stockList")
@@ -82,9 +83,12 @@ class JuChaoSearch(SpiderBase):
         pageNum: 1
         pageSize: 20
         '''
+
         url = '''http://www.cninfo.com.cn/new/userAnnouncement/getUserAnnouncementsList'''
         post_data = {
-            'stock': '000651,gssz0000651;002841,9900029752',
+            # 'stock': '000651,gssz0000651;002841,9900029752',
+            # 'stock': '002841,9900029752;601399,9900010450',
+            'stock': '002841,9900029752;',
             'searchkey': '',
             'seDate': '2000-01-01~2020-09-21',
             'sortName': 'time',
@@ -116,6 +120,7 @@ class JuChaoSearch(SpiderBase):
         ants = py_data.get("announcements")
         for ant in ants:
             item = dict()
+            item['id'] = ant.get("announcementId")
             item['SecuCode'] = ant.get("secCode")
             item['SecuAbbr'] = ant.get("secName")
             item['AntTitle'] = ant.get("announcementTitle")
@@ -150,8 +155,31 @@ class JuChaoSearch(SpiderBase):
             
             '''
 
+    def create_spider_table(self):
+        sql = '''
+         CREATE TABLE IF NOT EXISTS `{}` (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `SecuCode` varchar(8) NOT NULL COMMENT '证券代码',
+          `SecuAbbr` varchar(16) NOT NULL COMMENT '证券代码',
+          `AntTime` datetime NOT NULL COMMENT '发布时间',
+          `AntTitle` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '资讯标题',
+          `AntDoc` varchar(256) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '公告详情页链接',
+          `category` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '资讯类别',
+          `CREATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP,
+          `UPDATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          PRIMARY KEY (`id`),
+          UNIQUE KEY `code_doc` (`SecuCode`,`AntDoc`),
+          KEY `ant_time` (`AntTime`),
+          KEY `update_time` (`UPDATETIMEJZ`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='巨潮个股公告关联';  
+        '''.format(self.table_name)
+
+        pass
+
 
 if __name__ == '__main__':
     ins = JuChaoSearch()
-    ins.create_tools_table()
-    ins.get_stock_json()
+    # ins.create_tools_table()
+    # ins.get_stock_json()
+
+    ins.get_user_list()
