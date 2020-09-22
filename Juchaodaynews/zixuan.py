@@ -218,16 +218,16 @@ class JuChaoSearch(SpiderBase):
             'pageSize': 30, 
             'column': 'szse',
             'tabName': 'fulltext',
-            'plate': '',  
+            'plate': '',     # 版块
             'stock': '000001,gssz0000001', 
-            'searchkey': '',
+            'searchkey': '',    # 查询关键字
             'secid': '',
             'category': '',
-            'trade': '',
+            'trade': '',   # 行业分类
             'seDate': '2020-03-21~2020-09-22',
             'sortName': '',
             'sortType': '',
-            'isHLtitle': 'true',
+            'isHLtitle': True,
         }
 
         headers = {
@@ -250,20 +250,62 @@ class JuChaoSearch(SpiderBase):
         resp = requests.post(api, headers=headers, data=post_data)
         if resp.status_code == 200:
             text = resp.text
-            print(text)
+            # print(text)
+            py_datas = json.loads(text)
+            # print(py_datas)
+            ants = py_datas.get("announcements")
+            for ant in ants:
+                item = dict()
+                item['SecuCode'] = ant.get('secCode')
+                item['SecuAbbr'] = ant.get('secName')
+                item['OrgId'] = ant.get("orgId")
+                item['AntId'] = ant.get("announcementId")
+                item['Title'] = ant.get("announcementTitle")
+                time_stamp = ant.get("announcementTime") / 1000
+                item.update({'announcementTime': datetime.datetime.fromtimestamp(time_stamp)})
+                item.update({'adjunctUrl': 'http://static.cninfo.com.cn/' + ant.get("adjunctUrl")})
+                item['AntType'] = ant.get("announcementType")
+                print(item)
+                # print(ant)
+                # print(ant.keys())
+                '''
+                dict_keys([
+                'secCode',   # 证券代码 
+                'secName',   # 中文简称
+                'orgId',     # 证券编码 
+                'announcementId',   # 公告 id 
+                'announcementTitle',   # 公告标题 
+                'announcementTime',   # 发布时间 
+                'adjunctUrl',         # 公告网址 
+                'adjunctSize',       #  ** 
+                'adjunctType',       # 公告文档类型 
+                'storageTime',       # ** 
+                'columnId',          # ……
+                'pageColumn',        # …… 
+                'announcementType',  # 公告类型 
+                'associateAnnouncement',  # ……
+                'important',  # ** 
+                'batchNum',  # ** 
+                'announcementContent',   # ** 
+                'orgName',    # ** 
+                'announcementTypeName', # ** 
+                ])
+
+                '''
+                sys.exit(0)
         else:
             print(resp)
 
 
 if __name__ == '__main__':
     ins = JuChaoSearch()
-    ins.create_tools_table()
-    ins.get_stock_json()
+    # ins.create_tools_table()
+    # ins.get_stock_json()
 
     # ins.get_user_list()
     # ins.get_ant_type()
 
-    # ins.query_history()
+    ins.query_history()
 
 
     pass
