@@ -257,12 +257,13 @@ class JuChaoSearch(SpiderBase):
 
 if __name__ == '__main__':
     ins = JuChaoSearch()
-    # ins.create_tools_table()
-    # ins.get_stock_json()
+    ins.create_tools_table()
+    ins.get_stock_json()
+
     # ins.get_user_list()
     # ins.get_ant_type()
 
-    ins.query_history()
+    # ins.query_history()
 
 
     pass

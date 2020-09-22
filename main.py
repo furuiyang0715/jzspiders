@@ -76,6 +76,13 @@ class DockerSwith(SpiderBase, Daemon):
             print(msg)
 
     def docker_run_spider(self, spider_name, spider_file_path, restart=False):
+        """
+        重写 docker 的启动过程
+        :param spider_name: 容器名
+        :param spider_file_path: 运行Python文件的路径
+        :param restart: 是否对已经运行的容器进行重启
+        :return:
+        """
         local_int = 1 if LOCAL else 0
         try:
             spider_container = self.docker_containers_col.get(spider_name)
@@ -93,14 +100,39 @@ class DockerSwith(SpiderBase, Daemon):
             else:
                 logger.warning("other status: {}".format(spider_status))
         else:
-            self.docker_containers_col.run(
-                "registry.cn-shenzhen.aliyuncs.com/jzdev/jzdata/jzspi:v1",
-                environment={"LOCAL": local_int},
-                name='{}'.format(spider_name),
-                command='python {}'.format(spider_file_path),
-                detach=True,    # 守护进程运行
-            )
-            print("start success")
+            image = 'registry.cn-shenzhen.aliyuncs.com/jzdev/jzdata/jzspi:v1'
+            command = '''sudo docker run --log-opt max-size=10m --log-opt max-file=3 \
+-itd --name {} --env LOCAL={} {} \
+python {}'''.format(spider_name, local_int, image, spider_file_path)
+            print(command)
+            os.system(command=command)
+
+    # def docker_run_spider(self, spider_name, spider_file_path, restart=False):
+    #     local_int = 1 if LOCAL else 0
+    #     try:
+    #         spider_container = self.docker_containers_col.get(spider_name)
+    #     except:
+    #         spider_container = None
+    #
+    #     if spider_container:
+    #         spider_status = spider_container.status
+    #         logger.info("{} spider status: {}".format(spider_name, spider_status))
+    #         if spider_status in ("exited",):
+    #             spider_container.start()
+    #         elif spider_status in ("running",):
+    #             if restart:
+    #                 spider_container.restart()
+    #         else:
+    #             logger.warning("other status: {}".format(spider_status))
+    #     else:
+    #         self.docker_containers_col.run(
+    #             "registry.cn-shenzhen.aliyuncs.com/jzdev/jzdata/jzspi:v1",
+    #             environment={"LOCAL": local_int},
+    #             name='{}'.format(spider_name),
+    #             command='python {}'.format(spider_file_path),
+    #             detach=True,    # 守护进程运行
+    #         )
+    #         print("start success")
 
     def start_task(self, spider_name, spider_file_path, dt_str, restart=False):
         """
