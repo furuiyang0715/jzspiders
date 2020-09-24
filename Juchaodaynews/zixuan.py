@@ -213,99 +213,70 @@ class JuChaoSearch(SpiderBase):
 
     def query_history(self):
         api = 'http://www.cninfo.com.cn/new/hisAnnouncement/query'
-        post_data = {
-            'pageNum': 1, 
-            'pageSize': 30, 
-            'column': 'szse',
-            'tabName': 'fulltext',
-            'plate': '',     # 版块
-            'stock': '000001,gssz0000001', 
-            'searchkey': '',    # 查询关键字
-            'secid': '',
-            'category': '',
-            'trade': '',   # 行业分类
-            'seDate': '2020-03-21~2020-09-22',
-            'sortName': '',
-            'sortType': '',
-            'isHLtitle': True,
-        }
+        start_date = "2016-01-01"
+        end_date = datetime.datetime.today().strftime("%Y-%m-%d")
+        se_date = "{}~{}".format(start_date, end_date)
+        print(se_date)
+        for page in range(1000):
+            time.sleep(5)
+            post_data = {
+                'pageNum': page,
+                'pageSize': 30,
+                'column': 'szse',
+                'tabName': 'fulltext',
+                'plate': '',     # 版块
+                'stock': '000001,gssz0000001',
+                'searchkey': '',    # 查询关键字
+                'secid': '',
+                'category': '',
+                'trade': '',   # 行业分类
+                'seDate': se_date,
+                'sortName': '',
+                'sortType': '',
+                'isHLtitle': True,
+            }
 
-        headers = {
-            # 'Accept': '*/*',
-            # 'Accept-Encoding': 'gzip, deflate',
-            # 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-            # 'Cache-Control': 'no-cache',
-            # 'Connection': 'keep-alive',
-            # 'Content-Length': '183',
-            # 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            # 'Cookie': 'JSESSIONID=62B3DD042FE68A7569EBBD4A5D77725F; UC-JSESSIONID=2C4A8072D9088E2B55877BDA0380B541; _sp_ses.2141=*; _sp_id.2141=a878da76-08ce-42a8-9c5b-7e4ec1df3721.1597628172.8.1600673253.1600656098.7fb85f15-9771-48f0-be38-23113cced2d9',
-            # 'Host': 'www.cninfo.com.cn',
-            # 'Origin': 'http://www.cninfo.com.cn',
-            # 'Pragma': 'no-cache',
-            # 'Referer': 'http://www.cninfo.com.cn/new/commonUrl/pageOfSearch?url=disclosure/list/search&lastPage=index',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
-            # 'X-Requested-With': 'XMLHttpRequest',
-        }
+            headers = {
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate',
+                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Host': 'www.cninfo.com.cn',
+                'Origin': 'http://www.cninfo.com.cn',
+                'Pragma': 'no-cache',
+                'Referer': 'http://www.cninfo.com.cn/new/commonUrl/pageOfSearch?url=disclosure/list/search&lastPage=index',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36',
+            }
 
-        resp = requests.post(api, headers=headers, data=post_data)
-        if resp.status_code == 200:
-            text = resp.text
-            # print(text)
-            py_datas = json.loads(text)
-            # print(py_datas)
-            ants = py_datas.get("announcements")
-            for ant in ants:
-                item = dict()
-                item['SecuCode'] = ant.get('secCode')
-                item['SecuAbbr'] = ant.get('secName')
-                item['OrgId'] = ant.get("orgId")
-                item['AntId'] = ant.get("announcementId")
-                item['Title'] = ant.get("announcementTitle")
-                time_stamp = ant.get("announcementTime") / 1000
-                item.update({'announcementTime': datetime.datetime.fromtimestamp(time_stamp)})
-                item.update({'adjunctUrl': 'http://static.cninfo.com.cn/' + ant.get("adjunctUrl")})
-                item['AntType'] = ant.get("announcementType")
-                print(item)
-                # print(ant)
-                # print(ant.keys())
-                '''
-                dict_keys([
-                'secCode',   # 证券代码 
-                'secName',   # 中文简称
-                'orgId',     # 证券编码 
-                'announcementId',   # 公告 id 
-                'announcementTitle',   # 公告标题 
-                'announcementTime',   # 发布时间 
-                'adjunctUrl',         # 公告网址 
-                'adjunctSize',       #  ** 
-                'adjunctType',       # 公告文档类型 
-                'storageTime',       # ** 
-                'columnId',          # ……
-                'pageColumn',        # …… 
-                'announcementType',  # 公告类型 
-                'associateAnnouncement',  # ……
-                'important',  # ** 
-                'batchNum',  # ** 
-                'announcementContent',   # ** 
-                'orgName',    # ** 
-                'announcementTypeName', # ** 
-                ])
-
-                '''
-                sys.exit(0)
-        else:
-            print(resp)
+            resp = requests.post(api, headers=headers, data=post_data)
+            if resp.status_code == 200:
+                text = resp.text
+                if not text:
+                    return
+                py_datas = json.loads(text)
+                ants = py_datas.get("announcements")
+                for ant in ants:
+                    item = dict()
+                    item['SecuCode'] = ant.get('secCode')
+                    item['SecuAbbr'] = ant.get('secName')
+                    item['OrgId'] = ant.get("orgId")
+                    item['AntId'] = ant.get("announcementId")
+                    item['Title'] = ant.get("announcementTitle")
+                    time_stamp = ant.get("announcementTime") / 1000
+                    item.update({'announcementTime': datetime.datetime.fromtimestamp(time_stamp)})
+                    item.update({'adjunctUrl': 'http://static.cninfo.com.cn/' + ant.get("adjunctUrl")})
+                    item['AntType'] = ant.get("announcementType")
+                    print(item)
+            else:
+                print(resp)
 
 
 if __name__ == '__main__':
     ins = JuChaoSearch()
     # ins.create_tools_table()
     # ins.get_stock_json()
-
     # ins.get_user_list()
     # ins.get_ant_type()
-
     ins.query_history()
-
-
-    pass
