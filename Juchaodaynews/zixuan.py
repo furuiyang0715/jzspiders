@@ -14,8 +14,9 @@ class JuChaoSearch(SpiderBase):
     def __init__(self):
         super(JuChaoSearch, self).__init__()
         self.table_name = 'juchao_ant'
+        self.fields = ['SecuCode', 'SecuAbbr', 'AntId', 'AntTime', 'AntTitle', 'AntDoc']
 
-    # def get_code_status(self):
+        # def get_code_status(self):
     #     # api = '''http://uc.cninfo.com.cn/portfolio/getBatchStocksSelectedStatus'''
     #     text = '''{"list":[{"stockCode":"000895","organId":"gssz0000895","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":true},{"stockCode":"300117","organId":"9900013439","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"603288","organId":"9900023228","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600519","organId":"gssh0600519","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"000651","organId":"gssz0000651","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":true},{"stockCode":"002726","organId":"9900023003","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600887","organId":"gssh0600887","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"600566","organId":"gssh0600566","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"002372","organId":"9900011087","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false},{"stockCode":"601933","organId":"9900016367","stockName":null,"pinyin":null,"category":null,"sequence":null,"existInPortfolio":false}],"success":"true"}'''
     #     py_data = json.loads(text).get("list")
@@ -128,31 +129,6 @@ class JuChaoSearch(SpiderBase):
             item['AntTime'] = ant_time
             item['AntDoc'] = "http://static.cninfo.com.cn/" + ant.get("adjunctUrl")
             print(item)
-            '''
-            {
-            'adjunctSize': 320,
-            'adjunctType': 'PDF',
-            'adjunctUrl': 'finalpage/2020-09-17/1208450211.PDF',
-            'announcementContent': '',
-            'announcementId': '1208450211',
-            'announcementTime': 1600272000000,
-            'announcementTitle': '关于2018年限制性股票激励计划首次授予限制性股票第二个解除限售期解除限售股份上市流通的提示性公告',
-            'announcementType': '01010503||010112||010114||01130340||012325',
-            'announcementTypeName': None,
-            'associateAnnouncement': None,
-            'batchNum': None,
-            'columnId': '01010301||01010302||01010411||09020202||250201||251302||2705',
-            'id': None,
-            'important': None,
-            'orgId': '9900029752',
-            'orgName': None,
-            'pageColumn': 'SZZX',
-            'secCode': '002841',
-            'secName': '视源股份',
-            'storageTime': None, 
-            }
-            
-            '''
 
     def create_spider_table(self):
         sql = '''
@@ -160,20 +136,23 @@ class JuChaoSearch(SpiderBase):
           `id` int(11) NOT NULL AUTO_INCREMENT,
           `SecuCode` varchar(8) NOT NULL COMMENT '证券代码',
           `SecuAbbr` varchar(16) NOT NULL COMMENT '证券代码',
+          `AntId` int(11) NOT NULL COMMENT '巨潮自带公告 ID', 
           `AntTime` datetime NOT NULL COMMENT '发布时间',
           `AntTitle` varchar(128) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '资讯标题',
           `AntDoc` varchar(256) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '公告详情页链接',
-          `category` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '资讯类别',
           `CREATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP,
           `UPDATETIMEJZ` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           PRIMARY KEY (`id`),
+          UNIQUE KEY `ant_id` (`AntId`),
           UNIQUE KEY `code_doc` (`SecuCode`,`AntDoc`),
           KEY `ant_time` (`AntTime`),
           KEY `update_time` (`UPDATETIMEJZ`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='巨潮个股公告关联';  
         '''.format(self.table_name)
-
-        pass
+        self._spider_init()
+        self.spider_client.insert(sql)
+        self.spider_client.end()
+        # self.fields = ['SecuCode', 'SecuAbbr', 'AntId', 'AntTime', 'AntTitle', 'AntDoc']
 
     def get_ant_type(self):
         _map = dict()
@@ -213,12 +192,15 @@ class JuChaoSearch(SpiderBase):
 
     def query_history(self):
         api = 'http://www.cninfo.com.cn/new/hisAnnouncement/query'
-        start_date = "2016-01-01"
+        start_date = "2000-01-01"
         end_date = datetime.datetime.today().strftime("%Y-%m-%d")
         se_date = "{}~{}".format(start_date, end_date)
         print(se_date)
         for page in range(1000):
-            time.sleep(5)
+            time.sleep(1)
+            print()
+            print()
+            print()
             post_data = {
                 'pageNum': page,
                 'pageSize': 30,
@@ -253,22 +235,22 @@ class JuChaoSearch(SpiderBase):
             resp = requests.post(api, headers=headers, data=post_data)
             if resp.status_code == 200:
                 text = resp.text
-                if not text:
-                    return
+                print(">>>>>>> ", text)
                 py_datas = json.loads(text)
                 ants = py_datas.get("announcements")
+                if ants is None:
+                    return
                 for ant in ants:
                     item = dict()
                     item['SecuCode'] = ant.get('secCode')
                     item['SecuAbbr'] = ant.get('secName')
-                    item['OrgId'] = ant.get("orgId")
                     item['AntId'] = ant.get("announcementId")
-                    item['Title'] = ant.get("announcementTitle")
+                    item['AntTitle'] = ant.get("announcementTitle")
                     time_stamp = ant.get("announcementTime") / 1000
-                    item.update({'announcementTime': datetime.datetime.fromtimestamp(time_stamp)})
-                    item.update({'adjunctUrl': 'http://static.cninfo.com.cn/' + ant.get("adjunctUrl")})
-                    item['AntType'] = ant.get("announcementType")
-                    print(item)
+                    item.update({'AntTime': datetime.datetime.fromtimestamp(time_stamp)})
+                    item.update({'AntDoc': 'http://static.cninfo.com.cn/' + ant.get("adjunctUrl")})
+                    # print(item)
+                    self._save(self.spider_client, item, self.table_name, self.fields)
             else:
                 print(resp)
 
@@ -279,4 +261,6 @@ if __name__ == '__main__':
     # ins.get_stock_json()
     # ins.get_user_list()
     # ins.get_ant_type()
+
+    ins.create_spider_table()
     ins.query_history()
