@@ -30,16 +30,17 @@ class EconomicObserver(TakungpaoBase):
                 link = news.xpath('./dd[@class="intro"]/a/@href')[0]
                 # print(link)
                 item['link'] = link
-
+                # http://www.takungpao.com/finance/236134/2020/0929/502822.html
                 title = news.xpath("./dd/a/@title")[0]
                 # print(title)
                 title = self._process_content(title)
                 item['title'] = title
 
-                pub_date = news.xpath("./dd[@class='date']/text()")[0]
-                pub_date = self._process_pub_dt(pub_date)
-                # print(pub_date)
-                item['pub_date'] = pub_date
+                # pub_date = news.xpath("./dd[@class='date']/text()")[0]
+                # pub_date = self._process_pub_dt(pub_date)
+                # item['pub_date'] = pub_date
+
+                item['pub_date'] = self.parse_dt_from_link(link)
 
                 article = self._parse_detail(link)
                 if article:
@@ -77,9 +78,10 @@ class EconomicObserver(TakungpaoBase):
                 title = self._process_content(title)
                 item['Title'] = title
 
-                pub_date = news.xpath("./dd[@class='date']/text()")[0]
-                pub_date = self._process_pub_dt(pub_date)
-                item['PubDatetime'] = pub_date
+                # pub_date = news.xpath("./dd[@class='date']/text()")[0]
+                # pub_date = self._process_pub_dt(pub_date)
+                # item['PubDatetime'] = pub_date
+                item['PubDatetime'] = self.parse_dt_from_link(link)
 
                 article = self._parse_detail(link)
                 if article:
@@ -105,5 +107,6 @@ class EconomicObserver(TakungpaoBase):
 
 if __name__ == '__main__':
     EconomicObserver().run()
+    # EconomicObserver().start()
 
     pass

@@ -96,3 +96,9 @@ class TakungpaoBase(SpiderBase):
         self._spider_init()
         self.spider_client.insert(sql)
         self.spider_client.end()
+
+    def parse_dt_from_link(self, link):
+        lst = link.split('/')
+        _year, _month, _day = int(lst[-3]), int(lst[-2][:2]), int(lst[-2][2:])
+        dt = datetime.datetime(_year, _month, _day)
+        return dt
