@@ -1,7 +1,5 @@
 spiders_config = {
     # 表名[容器名]: [启动文件路径, 启动方式(间隔/定点), 启动参数, 增量标的字段, 爬虫中文简称
-    "juchao_kuaixun": ['Juchaodaynews/jcspider.py', "interval", (5, "minutes"), "CREATETIMEJZ", '巨潮快讯'],
-
     "juchao_info": ['Juchaodaynews/juchao_info.py', "interval", (10, "minutes"), "CREATETIMEJZ", '巨潮AI资讯'],
 
     "EEONews": ['EEOFinance/eeospider.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '经济观察网'],
@@ -38,6 +36,8 @@ spiders_config = {
 
     'securities_daily_latest': ['SecuritiesDaily/daily_news.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '证券日报-最新播报'],
 
-    'xueqiu_livenews': ['Kuaixun/xueqiu.py', 'interval', (1, 'minutes'), "CREATETIMEJZ", '雪球快讯'],
+    # 'xueqiu_livenews': ['Kuaixun/xueqiu.py', 'interval', (1, 'minutes'), "CREATETIMEJZ", '雪球快讯'],
+    # "juchao_kuaixun": ['Juchaodaynews/jcspider.py', "interval", (5, "minutes"), "CREATETIMEJZ", '巨潮快讯'],
+    #  将两个快讯单独放在一个模块中
 
 }
