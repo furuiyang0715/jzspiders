@@ -36,8 +36,8 @@ spiders_config = {
 
     'securities_daily_latest': ['SecuritiesDaily/daily_news.py', 'interval', (10, 'minutes'), "CREATETIMEJZ", '证券日报-最新播报'],
 
-    # 'xueqiu_livenews': ['Kuaixun/xueqiu.py', 'interval', (1, 'minutes'), "CREATETIMEJZ", '雪球快讯'],
+    'xueqiu_livenews': ['Kuaixun/xueqiu.py', 'interval', (1, 'minutes'), "CREATETIMEJZ", '雪球快讯'],
     # "juchao_kuaixun": ['Juchaodaynews/jcspider.py', "interval", (5, "minutes"), "CREATETIMEJZ", '巨潮快讯'],
-    #  将两个快讯单独放在一个模块中
+    # 20201020 巨潮快讯支持舆情猎手公告页 之后将单独放在一个模块中
 
 }
