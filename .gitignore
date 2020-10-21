@@ -4,3 +4,4 @@ __pycache__/
 *.log
 *.pid
 temp
+*.ini
