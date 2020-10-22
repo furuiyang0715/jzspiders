@@ -31,10 +31,10 @@ class BaiduSpider(SpiderBase):
                 error_info = word.encode("ISO-8859-1").decode("utf-8")
             except:
                 item['KeyWord'] = word
-                print(item)
                 return item
             else:
-                print("百度百科错误页")
+                # print("百度百科错误页")
+                pass
         else:
             raise
 
@@ -74,14 +74,25 @@ def mul_run():
     print("mul count: ", mul_count)
     combined = []
     with multiprocessing.Pool(mul_count) as workers:
-        # workers.map(task, [(1, 3), (4, 10), (11, 16), (17, 20)])
-        result_iter = workers.imap_unordered(task, [(1, 3), (4, 10), (11, 16), (17, 20)])
+        result_iter = workers.imap_unordered(task, dispath(100))
         for result_items in result_iter:
             combined.extend(result_items)
+            if len(combined) > 20:
+                print("save: ", len(combined))
+                print(combined)
+                combined = []
+    print("rest: ", len(combined))
     print(combined)
 
 
+def dispath(max_number):
+    for start in range(max_number // 10):
+        yield start * 10 + 1, start*10 + 10
+
+
 if __name__ == "__main__":
+    # dispath(102)
+
     # single_run()
 
     mul_run()
