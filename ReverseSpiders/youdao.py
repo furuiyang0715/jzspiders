@@ -1,59 +1,61 @@
+import hashlib
 import json
-import pprint
+import random
 import time
 
 import requests
 
 
-def youdao_trans():
+def youdao_trans(word):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36',
         'Host': 'fanyi.youdao.com',
         'Origin': 'http://fanyi.youdao.com',
         'Referer': 'http://fanyi.youdao.com/',
-        'cookie': 'OUTFOX_SEARCH_USER_ID=22609499@10.169.0.82; OUTFOX_SEARCH_USER_ID_NCOO=630557637.603828; _ga=GA1.2.1032060675.1592288066; _ntes_nnid=23cb853a21d77c5264e28f2c59cc9f2b,1592891475973; JSESSIONID=aaa0eq4z9k1AYfSZl6rux; SESSION_FROM_COOKIE=unknown; ___rl__test__cookies=1603277050695'
+        'cookie': '''OUTFOX_SEARCH_USER_ID=22609499@10.169.0.82;'''
     }
 
+    # 固定参数
     datas = {
-        'i': '在',
-        'from': 'AUTO',
-        'to': 'AUTO',
-        'smartresult': 'dict',
-        'client': 'fanyideskweb',
-        'salt': int(time.time()*1000),    # l = (new Date).getTime()
-        'sign': 'fab9a8633e875e8b442033e220f0ba73',
-        'lts': 1603276756880,    # lts: r.ts, --> r = v.generateSaltSign(n); -->
-        'bv': '06f98cf82d0c5619ee1ce529a71d378a',
+        'from': 'AUTO',    # 自动检测输入
+        'to': 'AUTO',      # 自动检测输出
+        'smartresult': 'dict',    # 响应格式 fixed
+        'client': 'fanyideskweb',   # 客户端标识  fixed
         'doctype': 'json',    # fixed
         'version': 2.1,       # fixed
         'keyfrom': 'fanyi.web',   # fixed
-        'action': 'FY_BY_CLICKBUTTION',
+        'action': 'FY_BY_CLICKBUTTION',   # fixed 动态 ajax 或者 捕获点击事件
+        'bv': '06f98cf82d0c5619ee1ce529a71d378a',
     }
 
+    salt = int(time.time() * 1000)
+    flower_str = "]BjuETDhU)zqSxf-=B#7m"
+    sign = hashlib.md5(('fanyideskweb' + word + str(salt) + flower_str).encode('utf-8')).hexdigest()
+
+    # 可变部分
     datas.update({
-        'i': '你',
-        'salt': 1603277253028,
-        'sign': '656bd20dde1ce0882094c8346b88fdb5',
-        'lts': 1603277253028,
-        'bv': '06f98cf82d0c5619ee1ce529a71d378a',
+        'salt': salt,  # l = (new Date).getTime()
+        'i': word,
+        'sign': sign,
+        'lts': salt + random.randint(1, 10),
     })
-
-    headers.update({"cookie": 'OUTFOX_SEARCH_USER_ID=22609499@10.169.0.82; OUTFOX_SEARCH_USER_ID_NCOO=630557637.603828; _ga=GA1.2.1032060675.1592288066; _ntes_nnid=23cb853a21d77c5264e28f2c59cc9f2b,1592891475973; JSESSIONID=aaa0eq4z9k1AYfSZl6rux; SESSION_FROM_COOKIE=unknown; ___rl__test__cookies=1603277253026'})
-
-    print(pprint.pformat(datas))
     post_api = 'http://fanyi.youdao.com/translate_o?smartresult=dict&smartresult=rule'
     resp = requests.post(post_api, headers=headers, data=datas)
 
     if resp and resp.status_code == 200:
         body = resp.text
         py_data = json.loads(body)
-        print(py_data)
-        ret = py_data.get("translateResult")[0][0].get("tgt")
+        try:
+            ret = py_data.get("translateResult")[0][0].get("tgt")
+        except:
+            return None
         return ret
     else:
-        print(resp)
-        return {}
+        return None
 
 
 if __name__ == '__main__':
-    print(youdao_trans())
+    # test
+
+    print(youdao_trans('你好'))
+    print(youdao_trans('talk is cheap'))
