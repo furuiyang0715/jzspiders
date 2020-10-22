@@ -17,6 +17,25 @@ class BaiduSpider(SpiderBase):
         super(BaiduSpider, self).__init__()
         self.base_url = 'http://baike.baidu.com/view/{}.html'
         self.headers.update({"Host": "baike.Baidu.com"})
+        self.fields = ['KeyId', 'KeyWord']
+        self.table_name = 'baidukeyword'
+
+    def _create_table(self):
+        sql = '''
+        CREATE TABLE IF NOT EXISTS `{}` (
+          `KeyId` int(11) NOT NULL COMMENT '词条ID',
+          `KeyWord` varchar(128) NOT NULL COMMENT '词条',
+          UNIQUE KEY `KeyId` (`KeyId`),
+          KEY `key_word` (`KeyWord`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='百度词条' ; 
+        '''.format(self.table_name)
+        self._spider_init()
+        self.spider_client.insert(sql)
+        self.spider_client.end()
+
+    def bd_save(self, items: list):
+        self._spider_init()
+        self._batch_save(self.spider_client, items, self.table_name, self.fields)
 
     def fetch_one(self, i):
         item = dict()
@@ -51,6 +70,7 @@ def timing(func):
 
 
 bd_spider = BaiduSpider()
+# bd_spider._create_table()
 
 
 # @timing
@@ -78,15 +98,17 @@ def mul_run():
         for result_items in result_iter:
             combined.extend(result_items)
             if len(combined) > 20:
-                print("save: ", len(combined))
-                print(combined)
+                # print("save: ", len(combined))
+                # print(combined)
+                bd_spider.bd_save(combined)
                 combined = []
-    print("rest: ", len(combined))
-    print(combined)
+    # print("rest: ", len(combined))
+    # print(combined)
+    bd_spider.bd_save(combined)
 
 
 def dispath(max_number):
-    for start in range(max_number // 10):
+    for start in range(max_number // 10 + 1):
         yield start * 10 + 1, start*10 + 10
 
 
