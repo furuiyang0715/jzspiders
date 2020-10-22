@@ -15,7 +15,7 @@ sys.path.insert(0, file_path)
 from daemon import Daemon
 from configs import LOCAL
 from base_spider import logger, SpiderBase
-from spiders_cfg import spiders_config
+from spiders_cfg import spiders_config, org_tablecode_map
 
 
 def catch_exceptions(cancel_on_failure=False):
@@ -59,7 +59,6 @@ class DockerSwith(SpiderBase, Daemon):
     def ding_crawl_information(self):
         self._spider_init()
         msg = ''
-        from scripts.utils import org_tablecode_map
         for tablename, info in org_tablecode_map.items():
             chiname, tablecode = info[0], info[1]
             sql = '''SELECT count(id) as inc_count FROM {} WHERE OrgTableCode = {} and {} > date_sub(CURDATE(), interval 1 day);'''.format("OriginSpiderAll", tablecode, "CreateTime")
