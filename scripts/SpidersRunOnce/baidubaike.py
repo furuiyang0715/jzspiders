@@ -1,5 +1,6 @@
 import multiprocessing
 import time
+from concurrent.futures.thread import ThreadPoolExecutor
 from functools import wraps
 
 import requests
@@ -88,22 +89,29 @@ def task(args):
     return items
 
 
+def thread_task(args):
+    items = []
+    start, end = args[0], args[1] + 1
+    executor = ThreadPoolExecutor(max_workers=4)
+    for item in executor.map(bd_spider.fetch_one, list(range(start, end))):
+        if item is not None:
+            items.append(item)
+    return items
+
+
 @timing
 def mul_run():
     mul_count = multiprocessing.cpu_count()
     print("mul count: ", mul_count)
     combined = []
     with multiprocessing.Pool(mul_count) as workers:
-        result_iter = workers.imap_unordered(task, dispath(100))
+        # result_iter = workers.imap_unordered(task, dispath(1000))
+        result_iter = workers.imap_unordered(thread_task, dispath(1000))
         for result_items in result_iter:
             combined.extend(result_items)
-            if len(combined) > 20:
-                # print("save: ", len(combined))
-                # print(combined)
+            if len(combined) > 50:
                 bd_spider.bd_save(combined)
                 combined = []
-    # print("rest: ", len(combined))
-    # print(combined)
     bd_spider.bd_save(combined)
 
 
@@ -117,7 +125,8 @@ if __name__ == "__main__":
 
     # single_run()
 
-    mul_run()
+    mul_run()   # 目前提速 43个网页/s
 
+    # thread_task((10, 100))
 
     pass
