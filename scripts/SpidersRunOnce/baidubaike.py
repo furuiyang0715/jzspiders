@@ -1,5 +1,9 @@
+import multiprocessing
 import os
 import sys
+import time
+from functools import wraps
+
 import requests
 from bs4 import BeautifulSoup
 from base_spider import SpiderBase
@@ -28,6 +32,7 @@ class BaiduSpider(SpiderBase):
                 error_info = word.encode("ISO-8859-1").decode("utf-8")
             except:
                 item['KeyWord'] = word
+                print(item)
                 return item
             else:
                 print("百度百科错误页")
@@ -35,39 +40,43 @@ class BaiduSpider(SpiderBase):
             raise
 
 
-def slice(mink, maxk):
-    s = 0.0
-    for k in range(int(mink), int(maxk)):
-        s += 1.0/(2*k+1)/(2*k+1)
-    return s
+def timing(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        r = func(*args, **kwargs)
+        end = time.perf_counter()
+        print('[' + func.__name__ + ']used:' + str(end - start))
+        return r
+    return wrapper
 
 
-def main(n):
-    pids = []
-    unit = n // 10
-    print("单个子进程分配的计算量是 {}".format(unit))
+bd_spider = BaiduSpider()
 
-    for i in range(10):
-        mink = unit * i
-        maxk = mink + unit
-        print("单个进程处理的起止点是从 {} 到 {}".format(mink, maxk))
-        pid = os.fork()
-        if pid > 0:
-            pids.append(pid)
-        else:
-            slice(mink, maxk)
-            sys.exit(0)
 
-    # TODO
+def task(args):
+    for number in range(args[0], args[1]+1):
+        bd_spider.fetch_one(number)
 
-    for pid in pids:
-        os.waitpid(pid, 0)  # 等待子进程结束
+
+@timing
+def mul_run():
+    mul_count = multiprocessing.cpu_count()
+    print("mul count: ", mul_count)
+    with multiprocessing.Pool(mul_count) as workers:
+        workers.map(task, [(1, 3), (4, 10), (11, 16), (17, 20)])
+
+
+@timing
+def single_run():
+    for num in range(1, 21):
+        bd_spider.fetch_one(num)
 
 
 if __name__ == "__main__":
-    # test single spider
-    # bd = BaiduSpider()
-    # print(bd.fetch_one(666))
-    # print(bd.fetch_one(10000000))
+    # single_run()
 
-    main(1000000)
+    mul_run()
+
+
+    pass
