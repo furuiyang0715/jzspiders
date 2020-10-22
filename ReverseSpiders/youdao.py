@@ -20,13 +20,13 @@ def youdao_trans():
         'to': 'AUTO',
         'smartresult': 'dict',
         'client': 'fanyideskweb',
-        'salt': 16032767568800,
+        'salt': int(time.time()*1000),    # l = (new Date).getTime()
         'sign': 'fab9a8633e875e8b442033e220f0ba73',
-        'lts': 1603276756880,
+        'lts': 1603276756880,    # lts: r.ts, --> r = v.generateSaltSign(n); -->
         'bv': '06f98cf82d0c5619ee1ce529a71d378a',
-        'doctype': 'json',
-        'version': 2.1,
-        'keyfrom': 'fanyi.web',
+        'doctype': 'json',    # fixed
+        'version': 2.1,       # fixed
+        'keyfrom': 'fanyi.web',   # fixed
         'action': 'FY_BY_CLICKBUTTION',
     }
 
