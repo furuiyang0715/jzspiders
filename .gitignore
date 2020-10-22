@@ -5,3 +5,4 @@ __pycache__/
 *.pid
 temp
 *.ini
+tools

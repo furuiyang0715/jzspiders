@@ -1,5 +1,6 @@
 import json
 import pprint
+import time
 
 import requests
 
@@ -28,6 +29,16 @@ def youdao_trans():
         'keyfrom': 'fanyi.web',
         'action': 'FY_BY_CLICKBUTTION',
     }
+
+    datas.update({
+        'i': '你',
+        'salt': 1603277253028,
+        'sign': '656bd20dde1ce0882094c8346b88fdb5',
+        'lts': 1603277253028,
+        'bv': '06f98cf82d0c5619ee1ce529a71d378a',
+    })
+
+    headers.update({"cookie": 'OUTFOX_SEARCH_USER_ID=22609499@10.169.0.82; OUTFOX_SEARCH_USER_ID_NCOO=630557637.603828; _ga=GA1.2.1032060675.1592288066; _ntes_nnid=23cb853a21d77c5264e28f2c59cc9f2b,1592891475973; JSESSIONID=aaa0eq4z9k1AYfSZl6rux; SESSION_FROM_COOKIE=unknown; ___rl__test__cookies=1603277253026'})
 
     print(pprint.pformat(datas))
     post_api = 'http://fanyi.youdao.com/translate_o?smartresult=dict&smartresult=rule'
