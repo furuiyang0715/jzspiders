@@ -1,6 +1,4 @@
 import multiprocessing
-import os
-import sys
 import time
 from functools import wraps
 
@@ -11,8 +9,9 @@ from base_spider import SpiderBase
 
 class BaiduSpider(SpiderBase):
     """
-    爬取百度百科词库
+    需求: 爬取百度百科词库
         暂定规则: 请求 http://baike.baidu.com/view/{n}.html  百度会一个词条放一个网页,依次递增, 暂无发现列表接口
+        目前词库更新到 4,000, 000 左右
     """
     def __init__(self):
         super(BaiduSpider, self).__init__()
@@ -54,23 +53,32 @@ def timing(func):
 bd_spider = BaiduSpider()
 
 
+# @timing
+# def single_run():
+#     for num in range(1, 21):
+#         bd_spider.fetch_one(num)
+
+
 def task(args):
+    items = []
     for number in range(args[0], args[1]+1):
-        bd_spider.fetch_one(number)
+        item = bd_spider.fetch_one(number)
+        if item is not None:
+            items.append(item)
+    return items
 
 
 @timing
 def mul_run():
     mul_count = multiprocessing.cpu_count()
     print("mul count: ", mul_count)
+    combined = []
     with multiprocessing.Pool(mul_count) as workers:
-        workers.map(task, [(1, 3), (4, 10), (11, 16), (17, 20)])
-
-
-@timing
-def single_run():
-    for num in range(1, 21):
-        bd_spider.fetch_one(num)
+        # workers.map(task, [(1, 3), (4, 10), (11, 16), (17, 20)])
+        result_iter = workers.imap_unordered(task, [(1, 3), (4, 10), (11, 16), (17, 20)])
+        for result_items in result_iter:
+            combined.extend(result_items)
+    print(combined)
 
 
 if __name__ == "__main__":
