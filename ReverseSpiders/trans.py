@@ -1,5 +1,6 @@
 # js 测试脚本
 
+
 def get_language_mark(language):
     language_map = {
         "中文": "zh-CHS",
